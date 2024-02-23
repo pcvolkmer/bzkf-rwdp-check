@@ -17,7 +17,7 @@ flowchart LR
     E -->|CSV-File| F[OPAL]
 ```
 
-## Prüfung der Daten in der CSV-Datei
+## Kennzahlen aus der CSV-Datei
 
 Vor Veröffentlichung der Daten der CSV-Datei in Opal kann die Anzahl der _Conditions_, gruppiert nach ICD-10 Gruppen,
 mit dem Befehl `opal-file` aus der CSV-Datei gewonnen werden.
@@ -28,7 +28,7 @@ bzkf-rwdp-check opal-file --file <Opal-CSV-Datei>.csv
 
 Die Anwendung gibt nun eine Liste der ICD-10-Gruppen mit Anzahl der _Conditions_ aus.
 
-## Prüfung der Daten in der Onkostar-Datenbank
+## Kennzahlen aus der Onkostar-Datenbank
 
 Die Anzahl der _Conditions_, gruppiert nach ICD-10-Gruppe, kann auch mit dem Befehl `database` aus der Onkostar-Datenbank
 abgerufen werden.
