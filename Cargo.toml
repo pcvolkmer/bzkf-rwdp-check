@@ -15,4 +15,11 @@ mysql = "24.0"
 serde = { version = "1.0", features = ["derive"] }
 urlencoding = "2.1"
 
+[profile.release]
+opt-level = "s"
+codegen-units = 1
+lto = true
+strip = true
+panic = "abort"
+
 
