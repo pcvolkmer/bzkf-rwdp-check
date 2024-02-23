@@ -17,6 +17,13 @@ flowchart LR
     E -->|CSV-File| F[OPAL]
 ```
 
+## Ermittelte Kennzahlen
+
+Die Anwendung gibt für die möglichen Quellen der Kennzahlen die Anzahl der _Conditions_, gruppiert nach ICD-10 Gruppen,
+aus.
+
+![Ausgabe](docs/screenshot.png)
+
 ## Kennzahlen aus der CSV-Datei
 
 Vor Veröffentlichung der Daten der CSV-Datei in Opal kann die Anzahl der _Conditions_, gruppiert nach ICD-10 Gruppen,
