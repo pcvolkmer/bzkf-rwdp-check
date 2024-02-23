@@ -25,10 +25,26 @@ use clap::Parser;
 use console::{style, Term};
 
 use crate::cli::{Cli, SubCommand};
+use crate::common::Icd10GroupSize;
+use crate::database::DatabaseSource;
 
-mod opal;
-mod common;
 mod cli;
+mod common;
+mod database;
+mod opal;
+mod resources;
+
+fn print_items(items: &[Icd10GroupSize]) {
+    let term = Term::stdout();
+    let _ = term.write_line(
+        &style("Anzahl der Conditions nach ICD-10-Gruppe")
+            .yellow()
+            .to_string(),
+    );
+    items.iter().for_each(|item| {
+        let _ = term.write_line(&format!("{:<20}={:>6}", item.name, item.size));
+    });
+}
 
 fn main() -> Result<(), Box<dyn Error>> {
     let term = Term::stdout();
@@ -38,13 +54,47 @@ fn main() -> Result<(), Box<dyn Error>> {
             let items = opal::OpalCsvFile::check(Path::new(&file))
                 .map_err(|_e| "Kann Datei nicht lesen")?;
 
-            let _ = term.write_line(&style("Anzahl der Conditions nach ICD-Gruppe").yellow().to_string());
-            items.iter().for_each(|item| {
-                let _ = term.write_line(&format!("{:<20}={:>6}", item.name, item.size));
-            });
-        },
-        SubCommand::Database { .. } => {
-            todo!("Not implemented yet")
+            print_items(&items);
+        }
+        SubCommand::Database {
+            database,
+            host,
+            password,
+            port,
+            user,
+            year,
+        } => {
+            let password = if let Some(password) = password {
+                password
+            } else {
+                let password = dialoguer::Password::new()
+                    .with_prompt("Password")
+                    .interact()
+                    .unwrap_or_default();
+                let _ = term.clear_last_lines(1);
+                password
+            };
+
+            let year = if year.len() == 4 {
+                year
+            } else {
+                format!("2{:0>3}", year)
+            };
+
+            let _ = term.write_line(
+                &style(format!("Warte auf Daten für das Diagnosejahr {}...", year))
+                    .blue()
+                    .to_string(),
+            );
+
+            let db = DatabaseSource::new(&database, &host, &password, port, &user);
+            let items = db
+                .check(&year)
+                .map_err(|_e| "Fehler bei Zugriff auf die Datenbank")?;
+
+            let _ = term.clear_last_lines(1);
+
+            print_items(&items);
         }
     }
 

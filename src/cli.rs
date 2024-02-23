@@ -22,7 +22,7 @@ use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
 #[command(author, version, about)]
-#[command(arg_required_else_help(true))]
+#[command(arg_required_else_help(true), disable_help_flag(true))]
 pub struct Cli {
     #[command(subcommand)]
     pub cmd: SubCommand,
@@ -30,20 +30,33 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum SubCommand {
-    #[command(
-    about = "Ermittelt die Prüfwerte aus einem CSV-File für OPAL"
-    )]
+    #[command(about = "Ermittelt die Prüfwerte aus einem CSV-File für OPAL")]
     OpalFile {
-        #[arg(short, long, help = "CSV-File für Opal")] file: String
+        #[arg(short, long, help = "CSV-File für Opal")]
+        file: String,
     },
-    #[command(
-    about = "Ermittelt die Prüfwerte aus einem CSV-File für OPAL"
-    )]
+    #[command(about = "Ermittelt die Prüfwerte aus einem CSV-File für OPAL")]
     Database {
-        #[arg(long, help = "Datenbank-Host", default_value="localhost")] host: String,
-        #[arg(long, help = "Datenbank-Host", default_value="3306")] port: u16,
-        #[arg(long, help = "Benutzername")] user: String,
-    }
-
-
+        #[arg(short = 'D', long, help = "Datenbank-Name", default_value = "onkostar")]
+        database: String,
+        #[arg(
+            short = 'h',
+            long,
+            help = "Datenbank-Host",
+            default_value = "localhost"
+        )]
+        host: String,
+        #[arg(short = 'P', long, help = "Datenbank-Host", default_value = "3306")]
+        port: u16,
+        #[arg(
+            short = 'p',
+            long,
+            help = "Passwort. Wenn nicht angegeben, wird danach gefragt"
+        )]
+        password: Option<String>,
+        #[arg(short = 'u', long, help = "Benutzername")]
+        user: String,
+        #[arg(short = 'y', long, help = "Jahr der Diagnose")]
+        year: String,
+    },
 }
