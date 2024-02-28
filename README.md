@@ -74,6 +74,6 @@ zusätzlich gibt es noch die folgenden Parameter:
 
 ```
 Options:
-      --pat-id               Export mit Klartext-Patienten-OD
+      --pat-id               Export mit Klartext-Patienten-ID
   -o, --output <OUTPUT>      Ausgabedatei
 ```
