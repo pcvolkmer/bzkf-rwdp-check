@@ -41,8 +41,7 @@ impl OpalCsvFile {
 
         let items = reader
             .deserialize::<OpalRecord>()
-            .filter(|record| record.is_ok())
-            .map(|record| record.unwrap())
+            .filter_map(|record| record.ok())
             .map(|record| Record {
                 condition_id: record.cond_id,
                 icd10_code: record.cond_coding_code,
@@ -57,8 +56,7 @@ impl OpalCsvFile {
 
         let items = reader
             .deserialize::<ExportData>()
-            .filter(|record| record.is_ok())
-            .map(|record| record.unwrap())
+            .filter_map(|record| record.ok())
             .collect::<Vec<_>>();
 
         Ok(items)
