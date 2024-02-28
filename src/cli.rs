@@ -89,4 +89,30 @@ pub enum SubCommand {
         #[arg(short = 'y', long, help = "Jahr der Diagnose")]
         year: String,
     },
+    #[command(about = "Abgleich zwischen CSV-Datei für OPAL und Onkostar-Datenbank")]
+    Compare {
+        #[arg(short = 'D', long, help = "Datenbank-Name", default_value = "onkostar")]
+        database: String,
+        #[arg(
+            short = 'h',
+            long,
+            help = "Datenbank-Host",
+            default_value = "localhost"
+        )]
+        host: String,
+        #[arg(short = 'P', long, help = "Datenbank-Host", default_value = "3306")]
+        port: u16,
+        #[arg(
+            short = 'p',
+            long,
+            help = "Passwort. Wenn nicht angegeben, wird danach gefragt"
+        )]
+        password: Option<String>,
+        #[arg(short = 'u', long, help = "Benutzername")]
+        user: String,
+        #[arg(short, long, help = "CSV-File für Opal")]
+        file: String,
+        #[arg(short = 'y', long, help = "Jahr der Diagnose")]
+        year: String,
+    },
 }

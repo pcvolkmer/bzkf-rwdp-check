@@ -20,24 +20,11 @@
 
 use mysql::prelude::Queryable;
 use mysql::{params, Pool};
-use serde::Serialize;
 
-use crate::common::Icd10GroupSize;
+use crate::common::{ExportData, Icd10GroupSize};
 use crate::resources::{EXPORT_QUERY, SQL_QUERY};
 
 pub struct DatabaseSource(String);
-
-#[derive(Serialize, Debug)]
-pub struct ExportData {
-    #[serde(rename = "pat_id")]
-    pat_id: Option<String>,
-    #[serde(rename = "cond_id")]
-    condition_id: String,
-    #[serde(rename = "condition_date")]
-    diagnosis_date: String,
-    #[serde(rename = "condcodingcode")]
-    icd_10_code: String,
-}
 
 impl DatabaseSource {
     pub fn new(database: &str, host: &str, password: &str, port: u16, user: &str) -> Self {

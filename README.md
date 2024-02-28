@@ -60,7 +60,7 @@ Options:
 
 ## Export aus der Onkostar-Datenbank
 
-Die Anwendung ist in der Lage, die Spalten
+Die Anwendung ist in der Lage, mit dem Befehl `export` die Spalten
 
 * `pat_id`: Patienten-ID (optional über Parameter `--pat-id`)
 * `cond_id`: Condition-ID
@@ -77,3 +77,10 @@ Options:
       --pat-id               Export mit Klartext-Patienten-ID
   -o, --output <OUTPUT>      Ausgabedatei
 ```
+
+## Vergleich CSV-Datei für OPAL und Onkostar-Datenbank
+
+Die Anwendung kann auch die Conditions in der CSV-Datei mit der Onkostar-Datenbank direkt vergleichen.
+
+Hierzu kann der Befehl `compare` genutzt werden. Dieser verwendet alle Optionen für die Datenbank und die Option `--file`
+für die CSV-Datei und gibt eine Übersicht auf der Konsole aus.

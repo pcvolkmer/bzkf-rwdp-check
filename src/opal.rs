@@ -23,7 +23,7 @@ use std::path::Path;
 use csv::Reader;
 use serde::Deserialize;
 
-use crate::common::{Check, Icd10GroupSize, Record};
+use crate::common::{Check, ExportData, Icd10GroupSize, Record};
 
 #[derive(Deserialize)]
 pub struct OpalRecord {
@@ -39,16 +39,28 @@ impl OpalCsvFile {
     pub fn check(path: &Path) -> Result<Vec<Icd10GroupSize>, ()> {
         let mut reader = Reader::from_path(path).expect("open file");
 
-        let items = reader.deserialize::<OpalRecord>()
+        let items = reader
+            .deserialize::<OpalRecord>()
             .filter(|record| record.is_ok())
             .map(|record| record.unwrap())
             .map(|record| Record {
                 condition_id: record.cond_id,
-                icd10_code: record.cond_coding_code
+                icd10_code: record.cond_coding_code,
             })
             .collect::<Vec<_>>();
 
         Check::collect(&items)
     }
 
+    pub fn export(path: &Path) -> Result<Vec<ExportData>, ()> {
+        let mut reader = Reader::from_path(path).expect("open file");
+
+        let items = reader
+            .deserialize::<ExportData>()
+            .filter(|record| record.is_ok())
+            .map(|record| record.unwrap())
+            .collect::<Vec<_>>();
+
+        Ok(items)
+    }
 }
