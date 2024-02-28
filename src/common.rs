@@ -32,7 +32,9 @@ pub struct Record {
 }
 
 pub struct DiffRecord {
+    pub pat_id: Option<String>,
     pub condition_id: String,
+    pub diagnosis_date: String,
     pub csv_icd10_code: String,
     pub db_icd10_code: String,
 }

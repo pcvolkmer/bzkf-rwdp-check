@@ -91,6 +91,8 @@ pub enum SubCommand {
     },
     #[command(about = "Abgleich zwischen CSV-Datei für OPAL und Onkostar-Datenbank")]
     Compare {
+        #[arg(long, help = "Klartext-Patienten-ID anzeigen")]
+        pat_id: bool,
         #[arg(short = 'D', long, help = "Datenbank-Name", default_value = "onkostar")]
         database: String,
         #[arg(

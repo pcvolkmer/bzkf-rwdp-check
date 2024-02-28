@@ -156,6 +156,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             );
         }
         SubCommand::Compare {
+            pat_id,
             database,
             host,
             password,
@@ -189,7 +190,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
             let db = DatabaseSource::new(&database, &host, &password, port, &user);
             let db_items = db
-                .export(&year, false)
+                .export(&year, pat_id)
                 .map_err(|_e| "Fehler bei Zugriff auf die Datenbank")?;
 
             let _ = term.clear_last_lines(1);
@@ -218,7 +219,10 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .to_string(),
             );
 
-            let _ = term.write_line(&format!("{:<64}   {:<5}", "Condition-ID", "ICD10"));
+            let _ = term.write_line(&format!(
+                "{:<64}   {:<10}   {:<5}   {:<5}   {}",
+                "Condition-ID", "Datum", "ICD10", "", "PAT-ID"
+            ));
 
             not_in_csv.sort_by_key(|item| item.condition_id.to_string());
 
@@ -227,15 +231,28 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .for_each(|item| match Check::is_relevant(&item.icd_10_code) {
                     true => {
                         let _ = term.write_line(&format!(
-                            "{}   {:<5}",
+                            "{:<64}   {:<10}   {:<5}   {:<5}   {}",
                             item.condition_id,
-                            style(&item.icd_10_code).bold().red()
+                            item.diagnosis_date,
+                            style(&item.icd_10_code).bold().red(),
+                            "",
+                            match &item.pat_id {
+                                Some(ref pat_id) => pat_id.to_string(),
+                                _ => "".to_string(),
+                            }
                         ));
                     }
                     false => {
                         let _ = term.write_line(&format!(
-                            "{}   {:<5}",
-                            item.condition_id, item.icd_10_code
+                            "{:<64}   {:<10}   {:<5}   {:<5}   {}",
+                            item.condition_id,
+                            item.diagnosis_date,
+                            item.icd_10_code,
+                            "",
+                            match &item.pat_id {
+                                Some(ref pat_id) => pat_id.to_string(),
+                                _ => "".to_string(),
+                            }
                         ));
                     }
                 });
@@ -261,7 +278,10 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .to_string(),
             );
 
-            let _ = term.write_line(&format!("{:<64}   {:<5}", "Condition-ID", "ICD10"));
+            let _ = term.write_line(&format!(
+                "{:<64}   {:<10}   {:<5}",
+                "Condition-ID", "Datum", "ICD10"
+            ));
 
             not_in_db.sort_by_key(|item| item.condition_id.to_string());
 
@@ -270,42 +290,44 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .for_each(|item| match Check::is_relevant(&item.icd_10_code) {
                     true => {
                         let _ = term.write_line(&format!(
-                            "{}   {:<5}",
+                            "{:<64}   {:<10}   {:<5}",
                             item.condition_id,
+                            item.diagnosis_date,
                             style(&item.icd_10_code).bold().red()
                         ));
                     }
                     false => {
                         let _ = term.write_line(&format!(
-                            "{}   {:<5}",
-                            item.condition_id, item.icd_10_code
+                            "{:<64}   {:<10}   {:<5}",
+                            item.condition_id, item.diagnosis_date, item.icd_10_code
                         ));
                     }
                 });
 
-            let mut icd10diff = csv_items
+            let mut icd10diff = db_items
                 .iter()
-                .filter(|csv_item| {
-                    db_items
+                .filter(|db_item| {
+                    csv_items
                         .iter()
                         .map(|db_item| &db_item.condition_id)
-                        .contains(&csv_item.condition_id)
+                        .contains(&db_item.condition_id)
                 })
-                .filter(|csv_item| {
-                    !db_items
+                .filter(|db_item| {
+                    !csv_items
                         .iter()
-                        .map(|db_item| format!("{}-{}", db_item.condition_id, db_item.icd_10_code))
-                        .contains(&format!(
-                            "{}-{}",
-                            csv_item.condition_id, csv_item.icd_10_code
-                        ))
+                        .map(|csv_item| {
+                            format!("{}-{}", csv_item.condition_id, csv_item.icd_10_code)
+                        })
+                        .contains(&format!("{}-{}", db_item.condition_id, db_item.icd_10_code))
                 })
-                .map(|csv_item| DiffRecord {
-                    condition_id: csv_item.condition_id.to_string(),
-                    csv_icd10_code: csv_item.icd_10_code.to_string(),
-                    db_icd10_code: db_items
+                .map(|db_item| DiffRecord {
+                    pat_id: db_item.pat_id.as_ref().map(|pat_id| pat_id.to_string()),
+                    condition_id: db_item.condition_id.to_string(),
+                    diagnosis_date: db_item.diagnosis_date.to_string(),
+                    csv_icd10_code: db_item.icd_10_code.to_string(),
+                    db_icd10_code: csv_items
                         .iter()
-                        .filter(|db_item| db_item.condition_id == csv_item.condition_id)
+                        .filter(|csv_item| csv_item.condition_id == db_item.condition_id)
                         .collect_vec()
                         .first()
                         .unwrap()
@@ -326,14 +348,15 @@ fn main() -> Result<(), Box<dyn Error>> {
             icd10diff.sort_by_key(|item| item.condition_id.to_string());
 
             let _ = term.write_line(&format!(
-                "{:<64}   {:<5}   {:<5}",
-                "Condition-ID", "CSV", "DB"
+                "{:<64}   {:<10}   {:<5}   {:<5}   {}",
+                "Condition-ID", "Datum", "CSV", "DB", "PAT-ID"
             ));
 
             icd10diff.iter().for_each(|item| {
                 let _ = term.write_line(&format!(
-                    "{}   {}   {}",
+                    "{:<64}   {:<10}   {:<5}   {:<5}   {}",
                     item.condition_id,
+                    item.diagnosis_date,
                     match Check::is_relevant(&item.csv_icd10_code) {
                         true => style(format!("{:<5}", item.csv_icd10_code)).bold().red(),
                         _ => style(format!("{:<5}", item.csv_icd10_code)),
@@ -341,6 +364,10 @@ fn main() -> Result<(), Box<dyn Error>> {
                     match Check::is_relevant(&item.db_icd10_code) {
                         true => style(format!("{:<5}", item.db_icd10_code)).bold().red(),
                         _ => style(format!("{:<5}", item.db_icd10_code)),
+                    },
+                    match &item.pat_id {
+                        Some(ref pat_id) => pat_id.to_string(),
+                        _ => "".to_string(),
                     }
                 ));
             });
