@@ -35,7 +35,7 @@ pub enum SubCommand {
         #[arg(short, long, help = "CSV-File für Opal")]
         file: String,
     },
-    #[command(about = "Ermittelt die Prüfwerte aus einem CSV-File für OPAL")]
+    #[command(about = "Ermittelt die Prüfwerte aus der Onkostar-Datenbank")]
     Database {
         #[arg(short = 'D', long, help = "Datenbank-Name", default_value = "onkostar")]
         database: String,
