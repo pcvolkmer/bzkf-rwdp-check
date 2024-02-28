@@ -23,6 +23,7 @@ use std::path::Path;
 
 use clap::Parser;
 use console::{style, Term};
+use csv::Writer;
 
 use crate::cli::{Cli, SubCommand};
 use crate::common::Icd10GroupSize;
@@ -95,6 +96,52 @@ fn main() -> Result<(), Box<dyn Error>> {
             let _ = term.clear_last_lines(1);
 
             print_items(&items);
+        }
+        SubCommand::Export {
+            pat_id,
+            database,
+            host,
+            password,
+            port,
+            user,
+            output,
+            year,
+        } => {
+            let password = if let Some(password) = password {
+                password
+            } else {
+                let password = dialoguer::Password::new()
+                    .with_prompt("Password")
+                    .interact()
+                    .unwrap_or_default();
+                let _ = term.clear_last_lines(1);
+                password
+            };
+
+            let year = if year.len() == 4 {
+                year
+            } else {
+                format!("2{:0>3}", year)
+            };
+
+            let _ = term.write_line(
+                &style(format!("Warte auf Daten für das Diagnosejahr {}...", year))
+                    .blue()
+                    .to_string(),
+            );
+
+            let db = DatabaseSource::new(&database, &host, &password, port, &user);
+            let items = db
+                .export(&year, pat_id)
+                .map_err(|_e| "Fehler bei Zugriff auf die Datenbank")?;
+
+            let _ = term.clear_last_lines(1);
+
+            let mut writer = Writer::from_path(Path::new(&output)).expect("writeable file");
+
+            items
+                .iter()
+                .for_each(|item| writer.serialize(item).unwrap());
         }
     }
 

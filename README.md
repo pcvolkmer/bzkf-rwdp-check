@@ -57,3 +57,23 @@ Options:
   -u, --user <USER>          Benutzername
   -y, --year <YEAR>          Jahr der Diagnose
 ```
+
+## Export aus der Onkostar-Datenbank
+
+Die Anwendung ist in der Lage, die Spalten
+
+* `pat_id`: Patienten-ID (optional über Parameter `--pat-id`)
+* `cond_id`: Condition-ID
+* `conditiondate`: Datum der Diagnose
+* `condcodingcode`: Der ICD-10-Code der Diagnose
+
+in eine CSV-Datei zum Abgleich mit der OPAL-CSV-Datei zu exportieren.
+
+Hierbei gelten die gleichen Datenbank-Parameter wie unter [Kennzahlen aus der Onkostar-Datenbank](#kennzahlen-aus-der-onkostar-datenbank),
+zusätzlich gibt es noch die folgenden Parameter:
+
+```
+Options:
+      --pat-id               Export mit Klartext-Patienten-OD
+  -o, --output <OUTPUT>      Ausgabedatei
+```

@@ -59,4 +59,34 @@ pub enum SubCommand {
         #[arg(short = 'y', long, help = "Jahr der Diagnose")]
         year: String,
     },
+    #[command(
+        about = "Erstellt eine (reduzierte) CSV-Datei zum direkten Vergleich mit der OPAL-CSV-Datei"
+    )]
+    Export {
+        #[arg(long, help = "Export mit Klartext-Patienten-ID")]
+        pat_id: bool,
+        #[arg(short = 'D', long, help = "Datenbank-Name", default_value = "onkostar")]
+        database: String,
+        #[arg(
+            short = 'h',
+            long,
+            help = "Datenbank-Host",
+            default_value = "localhost"
+        )]
+        host: String,
+        #[arg(short = 'P', long, help = "Datenbank-Host", default_value = "3306")]
+        port: u16,
+        #[arg(
+            short = 'p',
+            long,
+            help = "Passwort. Wenn nicht angegeben, wird danach gefragt"
+        )]
+        password: Option<String>,
+        #[arg(short = 'u', long, help = "Benutzername")]
+        user: String,
+        #[arg(short = 'o', long, help = "Ausgabedatei")]
+        output: String,
+        #[arg(short = 'y', long, help = "Jahr der Diagnose")]
+        year: String,
+    },
 }

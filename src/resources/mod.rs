@@ -19,3 +19,5 @@
  */
 
 pub const SQL_QUERY: &str = include_str!("query.sql");
+
+pub const EXPORT_QUERY: &str = include_str!("export.sql");

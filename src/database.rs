@@ -20,11 +20,24 @@
 
 use mysql::prelude::Queryable;
 use mysql::{params, Pool};
+use serde::Serialize;
 
 use crate::common::Icd10GroupSize;
-use crate::resources::SQL_QUERY;
+use crate::resources::{EXPORT_QUERY, SQL_QUERY};
 
 pub struct DatabaseSource(String);
+
+#[derive(Serialize, Debug)]
+pub struct ExportData {
+    #[serde(rename = "pat_id")]
+    pat_id: Option<String>,
+    #[serde(rename = "cond_id")]
+    condition_id: String,
+    #[serde(rename = "condition_date")]
+    diagnosis_date: String,
+    #[serde(rename = "condcodingcode")]
+    icd_10_code: String,
+}
 
 impl DatabaseSource {
     pub fn new(database: &str, host: &str, password: &str, port: u16, user: &str) -> Self {
@@ -50,8 +63,36 @@ impl DatabaseSource {
                     };
                 }
             }
-            Err(e) => {
-                println!("{}", e);
+            Err(_) => {
+                return Err(());
+            }
+        }
+
+        Err(())
+    }
+
+    pub fn export(&self, year: &str, use_pat_id: bool) -> Result<Vec<ExportData>, ()> {
+        match Pool::new(self.0.as_str()) {
+            Ok(pool) => {
+                if let Ok(mut connection) = pool.get_conn() {
+                    return match connection.exec_map(
+                        EXPORT_QUERY,
+                        params! {"year" => year},
+                        |(condition_id, icd_10_code, diagnosis_date, pat_id)| ExportData {
+                            condition_id,
+                            icd_10_code,
+                            diagnosis_date,
+                            pat_id: if use_pat_id { Some(pat_id) } else { None },
+                        },
+                    ) {
+                        Ok(result) => Ok(result),
+                        Err(_) => {
+                            return Err(());
+                        }
+                    };
+                }
+            }
+            Err(_) => {
                 return Err(());
             }
         }
