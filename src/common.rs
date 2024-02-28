@@ -76,10 +76,7 @@ impl Check {
     }
 
     pub fn is_relevant(code: &str) -> bool {
-        match Self::map_icd_code(code).as_str() {
-            "Other" => false,
-            _ => true,
-        }
+        !matches!(Self::map_icd_code(code).as_str(), "Other")
     }
 
     fn map_icd_code(code: &str) -> String {
