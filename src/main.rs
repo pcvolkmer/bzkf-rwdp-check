@@ -142,6 +142,17 @@ fn main() -> Result<(), Box<dyn Error>> {
             items
                 .iter()
                 .for_each(|item| writer.serialize(item).unwrap());
+
+            let _ = term.write_line(
+                &style(format!(
+                    "{} Conditions für das Jahr {} in Datei '{}' exportiert",
+                    items.len(),
+                    year,
+                    output
+                ))
+                .green()
+                .to_string(),
+            );
         }
     }
 
