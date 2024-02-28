@@ -112,7 +112,11 @@ SELECT CASE
 FROM (
 
     SELECT DISTINCT
-    EXTRACTVALUE(lme.xml_daten, '//Patienten_Stammdaten/@Patient_ID') AS pid, lme.versionsnummer, SHA2(CONCAT('https://fhir.diz.uk-erlangen.de/identifiers/onkostar-xml-condition-id|', EXTRACTVALUE(lme.xml_daten, '//Patienten_Stammdaten/@Patient_ID'), 'condition', EXTRACTVALUE(lme.xml_daten, '//Diagnose/@Tumor_ID')), 256) AS cond_id, SUBSTRING_INDEX(EXTRACTVALUE(lme.xml_daten, '//Primaertumor_ICD_Code'), ' ', 1) AS condcodingcode, SUBSTRING_INDEX(SUBSTRING_INDEX(EXTRACTVALUE(lme.xml_daten, '//Diagnosedatum'), ' ', 1), '.', -1) AS diagnosejahr
+        EXTRACTVALUE(lme.xml_daten, '//Patienten_Stammdaten/@Patient_ID') AS pid,
+        lme.versionsnummer,
+        SHA2(CONCAT('https://fhir.diz.uk-erlangen.de/identifiers/onkostar-xml-condition-id|', EXTRACTVALUE(lme.xml_daten, '//Patienten_Stammdaten/@Patient_ID'), 'condition', EXTRACTVALUE(lme.xml_daten, '//Diagnose/@Tumor_ID')), 256) AS cond_id,
+        SUBSTRING_INDEX(EXTRACTVALUE(lme.xml_daten, '//Primaertumor_ICD_Code'), ' ', 1) AS condcodingcode,
+        SUBSTRING_INDEX(SUBSTRING_INDEX(EXTRACTVALUE(lme.xml_daten, '//Diagnosedatum'), ' ', 1), '.', -1) AS diagnosejahr
     FROM lkr_meldung_export lme
     JOIN lkr_meldung lm ON (lm.id = lme.lkr_meldung AND lme.typ <> '-1')
     WHERE lme.xml_daten LIKE '%ICD_Version%'
@@ -123,7 +127,8 @@ FROM (
     LEFT OUTER JOIN (
 
     SELECT
-    SHA2(CONCAT('https://fhir.diz.uk-erlangen.de/identifiers/onkostar-xml-condition-id|', EXTRACTVALUE(lme.xml_daten, '//Patienten_Stammdaten/@Patient_ID'), 'condition', EXTRACTVALUE(lme.xml_daten, '//Diagnose/@Tumor_ID')), 256) AS cond_id, MAX(versionsnummer) AS max_version
+        SHA2(CONCAT('https://fhir.diz.uk-erlangen.de/identifiers/onkostar-xml-condition-id|', EXTRACTVALUE(lme.xml_daten, '//Patienten_Stammdaten/@Patient_ID'), 'condition', EXTRACTVALUE(lme.xml_daten, '//Diagnose/@Tumor_ID')), 256) AS cond_id,
+        MAX(versionsnummer) AS max_version
     FROM lkr_meldung_export lme
     WHERE SUBSTRING_INDEX(SUBSTRING_INDEX(EXTRACTVALUE(lme.xml_daten, '//Diagnosedatum'), ' ', 1), '.', -1) = :year
     GROUP BY cond_id ORDER BY cond_id
