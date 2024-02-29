@@ -68,7 +68,7 @@ impl Check {
             .map(|(icd10, group)| (icd10, group.collect::<Vec<_>>()))
             .map(|record| Icd10GroupSize {
                 name: record.0,
-                size: record.1.iter().count(),
+                size: record.1.len(),
             })
             .collect::<Vec<_>>();
 
