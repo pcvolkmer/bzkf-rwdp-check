@@ -36,6 +36,27 @@ mod database;
 mod opal;
 mod resources;
 
+fn request_password_if_none(password: Option<String>) -> String {
+    if let Some(password) = password {
+        password
+    } else {
+        let password = dialoguer::Password::new()
+            .with_prompt("Password")
+            .interact()
+            .unwrap_or_default();
+        let _ = Term::stdout().clear_last_lines(1);
+        password
+    }
+}
+
+fn sanitize_year(year: String) -> String {
+    if year.len() == 4 {
+        year
+    } else {
+        format!("2{:0>3}", year)
+    }
+}
+
 fn print_items(items: &[Icd10GroupSize]) {
     let term = Term::stdout();
     let _ = term.write_line(
@@ -66,22 +87,8 @@ fn main() -> Result<(), Box<dyn Error>> {
             user,
             year,
         } => {
-            let password = if let Some(password) = password {
-                password
-            } else {
-                let password = dialoguer::Password::new()
-                    .with_prompt("Password")
-                    .interact()
-                    .unwrap_or_default();
-                let _ = term.clear_last_lines(1);
-                password
-            };
-
-            let year = if year.len() == 4 {
-                year
-            } else {
-                format!("2{:0>3}", year)
-            };
+            let password = request_password_if_none(password);
+            let year = sanitize_year(year);
 
             let _ = term.write_line(
                 &style(format!("Warte auf Daten für das Diagnosejahr {}...", year))
@@ -108,22 +115,8 @@ fn main() -> Result<(), Box<dyn Error>> {
             output,
             year,
         } => {
-            let password = if let Some(password) = password {
-                password
-            } else {
-                let password = dialoguer::Password::new()
-                    .with_prompt("Password")
-                    .interact()
-                    .unwrap_or_default();
-                let _ = term.clear_last_lines(1);
-                password
-            };
-
-            let year = if year.len() == 4 {
-                year
-            } else {
-                format!("2{:0>3}", year)
-            };
+            let password = request_password_if_none(password);
+            let year = sanitize_year(year);
 
             let _ = term.write_line(
                 &style(format!("Warte auf Daten für das Diagnosejahr {}...", year))
@@ -165,22 +158,8 @@ fn main() -> Result<(), Box<dyn Error>> {
             file,
             year,
         } => {
-            let password = if let Some(password) = password {
-                password
-            } else {
-                let password = dialoguer::Password::new()
-                    .with_prompt("Password")
-                    .interact()
-                    .unwrap_or_default();
-                let _ = term.clear_last_lines(1);
-                password
-            };
-
-            let year = if year.len() == 4 {
-                year
-            } else {
-                format!("2{:0>3}", year)
-            };
+            let password = request_password_if_none(password);
+            let year = sanitize_year(year);
 
             let _ = term.write_line(
                 &style(format!("Warte auf Daten für das Diagnosejahr {}...", year))
