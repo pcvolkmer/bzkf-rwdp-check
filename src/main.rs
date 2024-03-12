@@ -67,6 +67,24 @@ fn print_items(items: &[Icd10GroupSize]) {
     items.iter().for_each(|item| {
         let _ = term.write_line(&format!("{:<20}={:>6}", item.name, item.size));
     });
+    let sum: usize = items
+        .iter()
+        .filter(|item| item.name != "Other")
+        .map(|item| item.size)
+        .sum();
+    let _ = term.write_line(&style("─".repeat(27)).dim().to_string());
+    let _ = term.write_line(
+        &style(format!("{:<20}={:>6}", "Summe (C**.*/D**.*)", sum))
+            .dim()
+            .to_string(),
+    );
+    let sum: usize = items.iter().map(|item| item.size).sum();
+    let _ = term.write_line(
+        &style(format!("{:<20}={:>6}", "Gesamtsumme", sum))
+            .dim()
+            .to_string(),
+    );
+    let _ = term.write_line(&style("─".repeat(27)).dim().to_string());
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
