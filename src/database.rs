@@ -37,7 +37,7 @@ impl DatabaseSource {
     pub fn check(&self, year: &str, ignore_exports_since: &str) -> Result<Vec<Icd10GroupSize>, ()> {
         match Pool::new(self.0.as_str()) {
             Ok(pool) => {
-                if let Ok(mut connection) = pool.get_conn() {
+                if let Ok(mut connection) = pool.try_get_conn(Duration::from_secs(3)) {
                     return match connection.exec_map(
                         SQL_QUERY,
                         params! {"year" => year, "ignore_exports_since" => ignore_exports_since},
@@ -67,7 +67,7 @@ impl DatabaseSource {
     ) -> Result<Vec<ExportData>, ()> {
         match Pool::new(self.0.as_str()) {
             Ok(pool) => {
-                if let Ok(mut connection) = pool.get_conn() {
+                if let Ok(mut connection) = pool.try_get_conn(Duration::from_secs(3)) {
                     return match connection.exec_map(
                         EXPORT_QUERY,
                         params! {"year" => year, "ignore_exports_since" => ignore_exports_since},
