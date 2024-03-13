@@ -15,6 +15,7 @@ itertools = "0.12"
 mysql = "24.0"
 serde = { version = "1.0", features = ["derive"] }
 urlencoding = "2.1"
+regex = "1.10"
 
 [profile.release]
 opt-level = "s"

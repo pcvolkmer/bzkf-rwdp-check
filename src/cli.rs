@@ -19,6 +19,7 @@
  */
 
 use clap::{Parser, Subcommand};
+use regex::Regex;
 
 #[derive(Parser)]
 #[command(author, version, about)]
@@ -58,6 +59,8 @@ pub enum SubCommand {
         user: String,
         #[arg(short = 'y', long, help = "Jahr der Diagnose")]
         year: String,
+        #[arg(long, value_parser = value_is_date, help = "Ignoriere LKR-Exporte seit Datum")]
+        ignore_exports_since: Option<String>,
     },
     #[command(
         about = "Erstellt eine (reduzierte) CSV-Datei zum direkten Vergleich mit der OPAL-CSV-Datei"
@@ -88,6 +91,8 @@ pub enum SubCommand {
         output: String,
         #[arg(short = 'y', long, help = "Jahr der Diagnose")]
         year: String,
+        #[arg(long, value_parser = value_is_date, help = "Ignoriere LKR-Exporte seit Datum")]
+        ignore_exports_since: Option<String>,
     },
     #[command(about = "Abgleich zwischen CSV-Datei für OPAL und Onkostar-Datenbank")]
     Compare {
@@ -116,5 +121,19 @@ pub enum SubCommand {
         file: String,
         #[arg(short = 'y', long, help = "Jahr der Diagnose")]
         year: String,
+        #[arg(long, value_parser = value_is_date, help = "Ignoriere LKR-Exporte seit Datum")]
+        ignore_exports_since: Option<String>,
     },
+}
+
+fn value_is_date(value: &str) -> Result<String, String> {
+    let re = Regex::new(r"^[0-9]{4}-[0-1][0-9]-[0-3][0-9]$").unwrap();
+    if re.is_match(value) {
+        Ok(value.into())
+    } else {
+        Err(format!(
+            "Ungültiges Datum '{}', bitte im Format 'yyyy-mm-dd' angeben",
+            value
+        ))
+    }
 }

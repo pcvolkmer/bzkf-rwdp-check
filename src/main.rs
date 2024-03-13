@@ -104,6 +104,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             port,
             user,
             year,
+            ignore_exports_since,
         } => {
             let password = request_password_if_none(password);
             let year = sanitize_year(year);
@@ -116,7 +117,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
             let db = DatabaseSource::new(&database, &host, &password, port, &user);
             let items = db
-                .check(&year)
+                .check(&year, &ignore_exports_since.unwrap_or("9999-12-31".into()))
                 .map_err(|_e| "Fehler bei Zugriff auf die Datenbank")?;
 
             let _ = term.clear_last_lines(1);
@@ -132,6 +133,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             user,
             output,
             year,
+            ignore_exports_since,
         } => {
             let password = request_password_if_none(password);
             let year = sanitize_year(year);
@@ -144,7 +146,11 @@ fn main() -> Result<(), Box<dyn Error>> {
 
             let db = DatabaseSource::new(&database, &host, &password, port, &user);
             let items = db
-                .export(&year, pat_id)
+                .export(
+                    &year,
+                    &ignore_exports_since.unwrap_or("9999-12-31".into()),
+                    pat_id,
+                )
                 .map_err(|_e| "Fehler bei Zugriff auf die Datenbank")?;
 
             let _ = term.clear_last_lines(1);
@@ -175,6 +181,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             user,
             file,
             year,
+            ignore_exports_since,
         } => {
             let password = request_password_if_none(password);
             let year = sanitize_year(year);
@@ -187,7 +194,11 @@ fn main() -> Result<(), Box<dyn Error>> {
 
             let db = DatabaseSource::new(&database, &host, &password, port, &user);
             let db_items = db
-                .export(&year, pat_id)
+                .export(
+                    &year,
+                    &ignore_exports_since.unwrap_or("9999-12-31".into()),
+                    pat_id,
+                )
                 .map_err(|_e| "Fehler bei Zugriff auf die Datenbank")?;
 
             let _ = term.clear_last_lines(1);

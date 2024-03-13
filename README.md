@@ -58,6 +58,10 @@ Options:
   -y, --year <YEAR>          Jahr der Diagnose
 ```
 
+Der zusätzliche Parameter `--ignore-exports-since` ist optional.
+Wird er angegeben, werden keine Einträge mit Exportdatum ab diesem Datum verwendet.
+Dies eignet sich um nachträglich Zahlen zu einem bestimmten Datum zu ermitteln.
+
 ## Export aus der Onkostar-Datenbank
 
 Die Anwendung ist in der Lage, mit dem Befehl `export` die Spalten

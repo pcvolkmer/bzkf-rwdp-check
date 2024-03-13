@@ -20,6 +20,7 @@
 
 use mysql::prelude::Queryable;
 use mysql::{params, Pool};
+use std::time::Duration;
 
 use crate::common::{ExportData, Icd10GroupSize};
 use crate::resources::{EXPORT_QUERY, SQL_QUERY};
@@ -33,13 +34,13 @@ impl DatabaseSource {
         DatabaseSource(url)
     }
 
-    pub fn check(&self, year: &str) -> Result<Vec<Icd10GroupSize>, ()> {
+    pub fn check(&self, year: &str, ignore_exports_since: &str) -> Result<Vec<Icd10GroupSize>, ()> {
         match Pool::new(self.0.as_str()) {
             Ok(pool) => {
                 if let Ok(mut connection) = pool.get_conn() {
                     return match connection.exec_map(
                         SQL_QUERY,
-                        params! {"year" => year},
+                        params! {"year" => year, "ignore_exports_since" => ignore_exports_since},
                         |(icd10_group, count)| Icd10GroupSize {
                             name: icd10_group,
                             size: count,
@@ -58,13 +59,18 @@ impl DatabaseSource {
         Err(())
     }
 
-    pub fn export(&self, year: &str, use_pat_id: bool) -> Result<Vec<ExportData>, ()> {
+    pub fn export(
+        &self,
+        year: &str,
+        ignore_exports_since: &str,
+        use_pat_id: bool,
+    ) -> Result<Vec<ExportData>, ()> {
         match Pool::new(self.0.as_str()) {
             Ok(pool) => {
                 if let Ok(mut connection) = pool.get_conn() {
                     return match connection.exec_map(
                         EXPORT_QUERY,
-                        params! {"year" => year},
+                        params! {"year" => year, "ignore_exports_since" => ignore_exports_since},
                         |(condition_id, icd_10_code, diagnosis_date, pat_id)| ExportData {
                             condition_id,
                             icd_10_code,
