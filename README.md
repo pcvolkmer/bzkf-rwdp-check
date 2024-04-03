@@ -22,6 +22,8 @@ flowchart LR
 Die Anwendung gibt für die möglichen Quellen der Kennzahlen die Anzahl der _Conditions_, gruppiert nach ICD-10 Gruppen,
 aus.
 
+Unterstützt wird eien OPAL-CSV-Datei (wie für BZKF vorgesehen) und eine Onkostar-Datenbank, basierend auf MariaDB oder MySQL.
+
 ![Ausgabe](docs/screenshot.png)
 
 ## Kennzahlen aus der CSV-Datei
