@@ -93,6 +93,8 @@ pub enum SubCommand {
         year: String,
         #[arg(long, value_parser = value_is_date, help = "Ignoriere LKR-Exporte seit Datum")]
         ignore_exports_since: Option<String>,
+        #[arg(long, help = "Export mit Trennzeichen ';' für Excel")]
+        xls_csv: bool,
     },
     #[command(about = "Abgleich zwischen CSV-Datei für OPAL und Onkostar-Datenbank")]
     Compare {

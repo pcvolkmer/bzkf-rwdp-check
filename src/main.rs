@@ -23,7 +23,7 @@ use std::path::Path;
 
 use clap::Parser;
 use console::{style, Term};
-use csv::Writer;
+use csv::WriterBuilder;
 use itertools::Itertools;
 
 use crate::cli::{Cli, SubCommand};
@@ -134,6 +134,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             output,
             year,
             ignore_exports_since,
+            xls_csv
         } => {
             let password = request_password_if_none(password);
             let year = sanitize_year(year);
@@ -155,7 +156,12 @@ fn main() -> Result<(), Box<dyn Error>> {
 
             let _ = term.clear_last_lines(1);
 
-            let mut writer = Writer::from_path(Path::new(&output)).expect("writeable file");
+            let writer_builder = &mut WriterBuilder::new();
+            let mut writer_builder = writer_builder.has_headers(true);
+            if xls_csv {
+                writer_builder = writer_builder.delimiter(b';');
+            }
+            let mut writer = writer_builder.from_path(Path::new(&output)).expect("writeable file");
 
             items
                 .iter()
