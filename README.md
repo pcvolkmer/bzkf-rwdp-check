@@ -82,6 +82,7 @@ zusätzlich gibt es noch die folgenden Parameter:
 Options:
       --pat-id               Export mit Klartext-Patienten-ID
   -o, --output <OUTPUT>      Ausgabedatei
+      --xls-csv              Export mit Trennzeichen ';' für Excel
 ```
 
 ## Vergleich CSV-Datei für OPAL und Onkostar-Datenbank
