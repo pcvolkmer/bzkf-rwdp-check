@@ -87,6 +87,13 @@ fn print_items(items: &[Icd10GroupSize]) {
     let _ = term.write_line(&style("─".repeat(27)).dim().to_string());
 }
 
+fn print_extern_notice(include_extern: bool) {
+    let _ = Term::stdout().write_line(format!("{} Die Datenbankanfrage schließt Meldungen mit externer Diagnose {}.", style("Hinweis:").bold().underlined(), match include_extern {
+        true => style("ein").yellow(),
+        false => style("nicht ein (Standard)").green()
+    }).as_str());
+}
+
 fn main() -> Result<(), Box<dyn Error>> {
     let term = Term::stdout();
 
@@ -105,6 +112,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             user,
             year,
             ignore_exports_since,
+            include_extern,
         } => {
             let password = request_password_if_none(password);
             let year = sanitize_year(year);
@@ -117,11 +125,16 @@ fn main() -> Result<(), Box<dyn Error>> {
 
             let db = DatabaseSource::new(&database, &host, &password, port, &user);
             let items = db
-                .check(&year, &ignore_exports_since.unwrap_or("9999-12-31".into()))
+                .check(
+                    &year,
+                    &ignore_exports_since.unwrap_or("9999-12-31".into()),
+                    include_extern,
+                )
                 .map_err(|_e| "Fehler bei Zugriff auf die Datenbank")?;
 
             let _ = term.clear_last_lines(1);
 
+            print_extern_notice(include_extern);
             print_items(&items);
         }
         SubCommand::Export {
@@ -134,7 +147,8 @@ fn main() -> Result<(), Box<dyn Error>> {
             output,
             year,
             ignore_exports_since,
-            xls_csv
+            xls_csv,
+            include_extern,
         } => {
             let password = request_password_if_none(password);
             let year = sanitize_year(year);
@@ -151,6 +165,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                     &year,
                     &ignore_exports_since.unwrap_or("9999-12-31".into()),
                     pat_id,
+                    include_extern,
                 )
                 .map_err(|_e| "Fehler bei Zugriff auf die Datenbank")?;
 
@@ -161,7 +176,9 @@ fn main() -> Result<(), Box<dyn Error>> {
             if xls_csv {
                 writer_builder = writer_builder.delimiter(b';');
             }
-            let mut writer = writer_builder.from_path(Path::new(&output)).expect("writeable file");
+            let mut writer = writer_builder
+                .from_path(Path::new(&output))
+                .expect("writeable file");
 
             items
                 .iter()
@@ -177,6 +194,8 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .green()
                 .to_string(),
             );
+
+            print_extern_notice(include_extern);
         }
         SubCommand::Compare {
             pat_id,
@@ -188,6 +207,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             file,
             year,
             ignore_exports_since,
+            include_extern,
         } => {
             let password = request_password_if_none(password);
             let year = sanitize_year(year);
@@ -204,6 +224,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                     &year,
                     &ignore_exports_since.unwrap_or("9999-12-31".into()),
                     pat_id,
+                    include_extern,
                 )
                 .map_err(|_e| "Fehler bei Zugriff auf die Datenbank")?;
 
@@ -221,6 +242,8 @@ fn main() -> Result<(), Box<dyn Error>> {
                         .contains(&db_item.condition_id)
                 })
                 .collect::<Vec<_>>();
+
+            print_extern_notice(include_extern);
 
             let _ = term.write_line(
                 &style(format!(

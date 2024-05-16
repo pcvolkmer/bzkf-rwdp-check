@@ -33,7 +33,7 @@ FROM (
         SUBSTRING_INDEX(EXTRACTVALUE(lme.xml_daten, '//Diagnosedatum'), ' ', 1) AS diagnosedatum,
         SUBSTRING_INDEX(SUBSTRING_INDEX(EXTRACTVALUE(lme.xml_daten, '//Diagnosedatum'), ' ', 1), '.', -1) AS diagnosejahr
     FROM lkr_meldung_export lme
-    JOIN lkr_meldung lm ON (lm.id = lme.lkr_meldung AND lme.typ <> '-1')
+    JOIN lkr_meldung lm ON (lm.id = lme.lkr_meldung AND lme.typ <> '-1' AND lm.extern <= :include_extern)
     JOIN lkr_export le ON (le.id = lme.lkr_export)
     WHERE lme.xml_daten LIKE '%ICD_Version%'
         AND SUBSTRING_INDEX(SUBSTRING_INDEX(EXTRACTVALUE(lme.xml_daten, '//Diagnosedatum'), ' ', 1), '.', -1) = :year

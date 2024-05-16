@@ -64,6 +64,9 @@ Der zusätzliche Parameter `--ignore-exports-since` ist optional.
 Wird er angegeben, werden keine Einträge mit Exportdatum ab diesem Datum verwendet.
 Dies eignet sich um nachträglich Zahlen zu einem bestimmten Datum zu ermitteln.
 
+Der Parameter `--include-extern` schließt Meldungen mit externer Diagnosestellung ein.
+Diese sind normalerweise nicht enthalten. 
+
 ## Export aus der Onkostar-Datenbank
 
 Die Anwendung ist in der Lage, mit dem Befehl `export` die Spalten

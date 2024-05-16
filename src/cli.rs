@@ -61,6 +61,8 @@ pub enum SubCommand {
         year: String,
         #[arg(long, value_parser = value_is_date, help = "Ignoriere LKR-Exporte seit Datum")]
         ignore_exports_since: Option<String>,
+        #[arg(long, help = "Meldungen mit externer Diagnose einschließen")]
+        include_extern: bool,
     },
     #[command(
         about = "Erstellt eine (reduzierte) CSV-Datei zum direkten Vergleich mit der OPAL-CSV-Datei"
@@ -95,6 +97,8 @@ pub enum SubCommand {
         ignore_exports_since: Option<String>,
         #[arg(long, help = "Export mit Trennzeichen ';' für Excel")]
         xls_csv: bool,
+        #[arg(long, help = "Meldungen mit externer Diagnose einschließen")]
+        include_extern: bool,
     },
     #[command(about = "Abgleich zwischen CSV-Datei für OPAL und Onkostar-Datenbank")]
     Compare {
@@ -125,6 +129,8 @@ pub enum SubCommand {
         year: String,
         #[arg(long, value_parser = value_is_date, help = "Ignoriere LKR-Exporte seit Datum")]
         ignore_exports_since: Option<String>,
+        #[arg(long, help = "Meldungen mit externer Diagnose einschließen")]
+        include_extern: bool,
     },
 }
 
