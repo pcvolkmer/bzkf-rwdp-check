@@ -34,18 +34,17 @@ FROM (
         SUBSTRING_INDEX(SUBSTRING_INDEX(EXTRACTVALUE(lme.xml_daten, '//Diagnosedatum'), ' ', 1), '.', -1) AS diagnosejahr
     FROM lkr_meldung_export lme
     JOIN lkr_meldung lm ON (lm.id = lme.lkr_meldung AND lme.typ <> '-1' AND lm.extern <= :include_extern)
-    JOIN lkr_export le ON (le.id = lme.lkr_export)
     WHERE lme.xml_daten LIKE '%ICD_Version%'
         AND SUBSTRING_INDEX(SUBSTRING_INDEX(EXTRACTVALUE(lme.xml_daten, '//Diagnosedatum'), ' ', 1), '.', -1) = :year
         AND (lme.xml_daten LIKE '%<cTNM%' OR lme.xml_daten LIKE '%<pTNM%' OR lme.xml_daten LIKE '%<Menge_Histologie>%' OR lme.xml_daten LIKE '%<Menge_Weitere_Klassifikation>%')
-        AND le.exportiert_am < :ignore_exports_since
     ) o1
     LEFT OUTER JOIN (
 
-    SELECT
+    SELECT DISTINCT
         SHA2(CONCAT('https://fhir.diz.uk-erlangen.de/identifiers/onkostar-xml-condition-id|', EXTRACTVALUE(lme.xml_daten, '//Patienten_Stammdaten/@Patient_ID'), 'condition', EXTRACTVALUE(lme.xml_daten, '//Diagnose/@Tumor_ID')), 256) AS cond_id,
-        MAX(versionsnummer) AS max_version
+        CASE WHEN le.exportiert_am < :ignore_exports_since THEN MAX(versionsnummer) ELSE ~0 END AS max_version
     FROM lkr_meldung_export lme
+        JOIN lkr_export le ON (lme.lkr_export = le.id)
     WHERE SUBSTRING_INDEX(SUBSTRING_INDEX(EXTRACTVALUE(lme.xml_daten, '//Diagnosedatum'), ' ', 1), '.', -1) = :year
     GROUP BY cond_id ORDER BY cond_id
 
