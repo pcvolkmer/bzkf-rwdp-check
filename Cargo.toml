@@ -1,6 +1,6 @@
 [package]
 name = "bzkf-rwdp-check"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2021"
 authors = ["Paul-Christian Volkmer <volkmer_p@ukw.de>"]
 description = "Anwendung zur Durchführung einer Plausibilitätsprüfung anhand der Daten für die BZKF Real World Data Platform."
