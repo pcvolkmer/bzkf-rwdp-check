@@ -40,13 +40,19 @@ impl DatabaseSource {
         year: &str,
         ignore_exports_since: &str,
         include_extern: bool,
+        include_histo_zyto: bool,
     ) -> Result<Vec<Icd10GroupSize>, ()> {
         match Pool::new(self.0.as_str()) {
             Ok(pool) => {
                 if let Ok(mut connection) = pool.try_get_conn(Duration::from_secs(3)) {
                     return match connection.exec_map(
                         SQL_QUERY,
-                        params! {"year" => year, "ignore_exports_since" => ignore_exports_since, "include_extern" => if include_extern { 1 } else { 0 } },
+                        params! {
+                            "year" => year,
+                            "ignore_exports_since" => ignore_exports_since,
+                            "include_extern" => if include_extern { 1 } else { 0 },
+                            "include_histo_zyto" => if include_histo_zyto { 1 } else { 0 }
+                        },
                         |(icd10_group, count)| Icd10GroupSize {
                             name: icd10_group,
                             size: count,
@@ -71,13 +77,19 @@ impl DatabaseSource {
         ignore_exports_since: &str,
         use_pat_id: bool,
         include_extern: bool,
+        include_histo_zyto: bool,
     ) -> Result<Vec<ExportData>, ()> {
         match Pool::new(self.0.as_str()) {
             Ok(pool) => {
                 if let Ok(mut connection) = pool.try_get_conn(Duration::from_secs(3)) {
                     return match connection.exec_map(
                         EXPORT_QUERY,
-                        params! {"year" => year, "ignore_exports_since" => ignore_exports_since, "include_extern" => if include_extern { 1 } else { 0 } },
+                        params! {
+                            "year" => year,
+                            "ignore_exports_since" => ignore_exports_since,
+                            "include_extern" => if include_extern { 1 } else { 0 },
+                            "include_histo_zyto" => if include_histo_zyto { 1 } else { 0 }
+                        },
                         |(condition_id, icd_10_code, diagnosis_date, pat_id)| ExportData {
                             condition_id,
                             icd_10_code,

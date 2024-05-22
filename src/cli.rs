@@ -63,6 +63,11 @@ pub enum SubCommand {
         ignore_exports_since: Option<String>,
         #[arg(long, help = "Meldungen mit externer Diagnose einschließen")]
         include_extern: bool,
+        #[arg(
+            long,
+            help = "Meldungen mit Meldeanlass 'histologie_zytologie' einschließen"
+        )]
+        include_histo_zyto: bool,
     },
     #[command(
         about = "Erstellt eine (reduzierte) CSV-Datei zum direkten Vergleich mit der OPAL-CSV-Datei"
@@ -99,6 +104,11 @@ pub enum SubCommand {
         xls_csv: bool,
         #[arg(long, help = "Meldungen mit externer Diagnose einschließen")]
         include_extern: bool,
+        #[arg(
+            long,
+            help = "Meldungen mit Meldeanlass 'histologie_zytologie' einschließen"
+        )]
+        include_histo_zyto: bool,
     },
     #[command(about = "Abgleich zwischen CSV-Datei für OPAL und Onkostar-Datenbank")]
     Compare {
@@ -131,6 +141,11 @@ pub enum SubCommand {
         ignore_exports_since: Option<String>,
         #[arg(long, help = "Meldungen mit externer Diagnose einschließen")]
         include_extern: bool,
+        #[arg(
+            long,
+            help = "Meldungen mit Meldeanlass 'histologie_zytologie' einschließen"
+        )]
+        include_histo_zyto: bool,
     },
 }
 

@@ -22,7 +22,8 @@ flowchart LR
 Die Anwendung gibt für die möglichen Quellen der Kennzahlen die Anzahl der _Conditions_, gruppiert nach ICD-10 Gruppen,
 aus.
 
-Unterstützt wird eien OPAL-CSV-Datei (wie für BZKF vorgesehen) und eine Onkostar-Datenbank, basierend auf MariaDB oder MySQL.
+Unterstützt wird eien OPAL-CSV-Datei (wie für BZKF vorgesehen) und eine Onkostar-Datenbank, basierend auf MariaDB oder
+MySQL.
 
 ![Ausgabe](docs/screenshot.png)
 
@@ -39,8 +40,8 @@ Die Anwendung gibt nun eine Liste der ICD-10-Gruppen mit Anzahl der _Conditions_
 
 ## Kennzahlen aus der Onkostar-Datenbank
 
-Die Anzahl der _Conditions_, gruppiert nach ICD-10-Gruppe, kann auch mit dem Befehl `database` aus der Onkostar-Datenbank
-abgerufen werden.
+Die Anzahl der _Conditions_, gruppiert nach ICD-10-Gruppe, kann auch mit dem Befehl `database` aus der
+Onkostar-Datenbank abgerufen werden.
 
 ```
 bzkf-rwdp-check database --user me --year 2024
@@ -64,8 +65,11 @@ Der zusätzliche Parameter `--ignore-exports-since` ist optional.
 Wird er angegeben, werden keine Einträge mit Exportdatum ab diesem Datum verwendet.
 Dies eignet sich um nachträglich Zahlen zu einem bestimmten Datum zu ermitteln.
 
-Der Parameter `--include-extern` schließt Meldungen mit externer Diagnosestellung ein.
-Diese sind normalerweise nicht enthalten. 
+Der optionale Parameter `--include-extern` schließt Meldungen mit externer Diagnosestellung ein.
+Diese sind normalerweise nicht enthalten.
+
+Der optionale Parameter `--include-histo-zyto` schließt Meldungen mit Meldeanlass `histologhie_zytologie` ein.
+Diese sind normalerweise ebenfalls nicht enthalten.
 
 ## Export aus der Onkostar-Datenbank
 
@@ -78,8 +82,9 @@ Die Anwendung ist in der Lage, mit dem Befehl `export` die Spalten
 
 in eine CSV-Datei zum Abgleich mit der OPAL-CSV-Datei zu exportieren.
 
-Hierbei gelten die gleichen Datenbank-Parameter wie unter [Kennzahlen aus der Onkostar-Datenbank](#kennzahlen-aus-der-onkostar-datenbank),
-zusätzlich gibt es noch die folgenden Parameter:
+Hierbei gelten die gleichen Datenbank-Parameter wie
+unter [Kennzahlen aus der Onkostar-Datenbank](#kennzahlen-aus-der-onkostar-datenbank), zusätzlich gibt es noch die
+folgenden Parameter:
 
 ```
 Options:
@@ -92,5 +97,5 @@ Options:
 
 Die Anwendung kann auch die Conditions in der CSV-Datei mit der Onkostar-Datenbank direkt vergleichen.
 
-Hierzu kann der Befehl `compare` genutzt werden. Dieser verwendet alle Optionen für die Datenbank und die Option `--file`
-für die CSV-Datei und gibt eine Übersicht auf der Konsole aus.
+Hierzu kann der Befehl `compare` genutzt werden. Dieser verwendet alle Optionen für die Datenbank und die
+Option `--file` für die CSV-Datei und gibt eine Übersicht auf der Konsole aus.

@@ -120,6 +120,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             year,
             ignore_exports_since,
             include_extern,
+            include_histo_zyto,
         } => {
             let password = request_password_if_none(password);
             let year = sanitize_year(year);
@@ -136,6 +137,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                     &year,
                     &ignore_exports_since.unwrap_or("9999-12-31".into()),
                     include_extern,
+                    include_histo_zyto,
                 )
                 .map_err(|_e| "Fehler bei Zugriff auf die Datenbank")?;
 
@@ -156,6 +158,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             ignore_exports_since,
             xls_csv,
             include_extern,
+            include_histo_zyto,
         } => {
             let password = request_password_if_none(password);
             let year = sanitize_year(year);
@@ -173,6 +176,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                     &ignore_exports_since.unwrap_or("9999-12-31".into()),
                     pat_id,
                     include_extern,
+                    include_histo_zyto,
                 )
                 .map_err(|_e| "Fehler bei Zugriff auf die Datenbank")?;
 
@@ -215,6 +219,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             year,
             ignore_exports_since,
             include_extern,
+            include_histo_zyto,
         } => {
             let password = request_password_if_none(password);
             let year = sanitize_year(year);
@@ -232,6 +237,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                     &ignore_exports_since.unwrap_or("9999-12-31".into()),
                     pat_id,
                     include_extern,
+                    include_histo_zyto,
                 )
                 .map_err(|_e| "Fehler bei Zugriff auf die Datenbank")?;
 

@@ -37,7 +37,7 @@ FROM (
     WHERE lm.xml_daten LIKE '%ICD_Version%'
         AND SUBSTRING_INDEX(SUBSTRING_INDEX(EXTRACTVALUE(lm.xml_daten, '//Diagnosedatum'), ' ', 1), '.', -1) = :year
         AND (lm.xml_daten LIKE '%<cTNM%' OR lm.xml_daten LIKE '%<pTNM%' OR lm.xml_daten LIKE '%<Menge_Histologie>%' OR lm.xml_daten LIKE '%<Menge_Weitere_Klassifikation>%')
-        AND (lm.xml_daten NOT LIKE '%histologie_zytologie%')
+        AND (lm.xml_daten NOT LIKE '%histologie_zytologie%' OR 1 = :include_histo_zyto)
     ) o1
     LEFT OUTER JOIN (
 
