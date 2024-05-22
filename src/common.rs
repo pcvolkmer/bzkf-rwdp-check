@@ -63,7 +63,7 @@ impl Check {
                 icd10_code: Self::map_icd_code(&record.icd10_code),
             })
             .sorted_by_key(|record| record.icd10_code.to_string())
-            .group_by(|record| record.icd10_code.to_string())
+            .chunk_by(|record| record.icd10_code.to_string())
             .into_iter()
             .map(|(icd10, group)| (icd10, group.collect::<Vec<_>>()))
             .map(|record| Icd10GroupSize {
