@@ -88,10 +88,17 @@ fn print_items(items: &[Icd10GroupSize]) {
 }
 
 fn print_extern_notice(include_extern: bool) {
-    let _ = Term::stdout().write_line(format!("{} Die Datenbankanfrage schließt Meldungen mit externer Diagnose {}.", style("Hinweis:").bold().underlined(), match include_extern {
-        true => style("ein").yellow(),
-        false => style("nicht ein (Standard)").green()
-    }).as_str());
+    let _ = Term::stdout().write_line(
+        format!(
+            "{} Die Datenbankanfrage schließt Meldungen mit externer Diagnose {}.",
+            style("Hinweis:").bold().underlined(),
+            match include_extern {
+                true => style("ein").yellow(),
+                false => style("nicht ein (Standard)").green(),
+            }
+        )
+        .as_str(),
+    );
 }
 
 fn main() -> Result<(), Box<dyn Error>> {

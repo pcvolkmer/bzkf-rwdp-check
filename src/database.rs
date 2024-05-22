@@ -18,9 +18,10 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+use std::time::Duration;
+
 use mysql::prelude::Queryable;
 use mysql::{params, Pool};
-use std::time::Duration;
 
 use crate::common::{ExportData, Icd10GroupSize};
 use crate::resources::{EXPORT_QUERY, SQL_QUERY};
