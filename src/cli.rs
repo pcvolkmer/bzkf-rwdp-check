@@ -20,6 +20,7 @@
 
 use clap::{Parser, Subcommand};
 use regex::Regex;
+use std::path::PathBuf;
 
 #[derive(Parser)]
 #[command(author, version, about)]
@@ -34,7 +35,7 @@ pub enum SubCommand {
     #[command(about = "Ermittelt die Prüfwerte aus einem CSV-File für OPAL")]
     OpalFile {
         #[arg(short, long, help = "CSV-File für Opal")]
-        file: String,
+        file: PathBuf,
     },
     #[command(about = "Ermittelt die Prüfwerte aus der Onkostar-Datenbank")]
     Database {
@@ -95,7 +96,7 @@ pub enum SubCommand {
         #[arg(short = 'u', long, help = "Benutzername")]
         user: String,
         #[arg(short = 'o', long, help = "Ausgabedatei")]
-        output: String,
+        output: PathBuf,
         #[arg(short = 'y', long, help = "Jahr der Diagnose")]
         year: String,
         #[arg(long, value_parser = value_is_date, help = "Ignoriere LKR-Exporte seit Datum")]
@@ -134,7 +135,7 @@ pub enum SubCommand {
         #[arg(short = 'u', long, help = "Benutzername")]
         user: String,
         #[arg(short, long, help = "CSV-File für Opal")]
-        file: String,
+        file: PathBuf,
         #[arg(short = 'y', long, help = "Jahr der Diagnose")]
         year: String,
         #[arg(long, value_parser = value_is_date, help = "Ignoriere LKR-Exporte seit Datum")]

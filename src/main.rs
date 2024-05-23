@@ -19,7 +19,6 @@
  */
 
 use std::error::Error;
-use std::path::Path;
 
 use clap::Parser;
 use console::{style, Term};
@@ -106,8 +105,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     match Cli::parse().cmd {
         SubCommand::OpalFile { file } => {
-            let items = opal::OpalCsvFile::check(Path::new(&file))
-                .map_err(|_e| "Kann Datei nicht lesen")?;
+            let items =
+                opal::OpalCsvFile::check(file.as_path()).map_err(|_e| "Kann Datei nicht lesen")?;
 
             print_items(&items);
         }
@@ -188,7 +187,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 writer_builder = writer_builder.delimiter(b';');
             }
             let mut writer = writer_builder
-                .from_path(Path::new(&output))
+                .from_path(output.as_path())
                 .expect("writeable file");
 
             items
@@ -200,7 +199,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                     "{} Conditions für das Jahr {} in Datei '{}' exportiert",
                     items.len(),
                     year,
-                    output
+                    output.to_str().unwrap_or_default()
                 ))
                 .green()
                 .to_string(),
@@ -243,8 +242,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 
             let _ = term.clear_last_lines(1);
 
-            let csv_items = opal::OpalCsvFile::export(Path::new(&file))
-                .map_err(|_e| "Kann Datei nicht lesen")?;
+            let csv_items =
+                opal::OpalCsvFile::export(file.as_path()).map_err(|_e| "Kann Datei nicht lesen")?;
 
             let mut not_in_csv = db_items
                 .iter()
@@ -263,7 +262,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                     "{} Conditions aus der Datenbank für das Jahr {} - aber nicht in Datei '{}'",
                     not_in_csv.len(),
                     year,
-                    file
+                    file.to_str().unwrap_or_default()
                 ))
                 .green()
                 .to_string(),
@@ -321,7 +320,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 &style(format!(
                     "{} Conditions aus Datei '{}' - aber nicht in der Datenbank für das Jahr {}",
                     not_in_db.len(),
-                    file,
+                    file.to_str().unwrap_or_default(),
                     year
                 ))
                 .green()
