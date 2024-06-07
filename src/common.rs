@@ -116,3 +116,15 @@ impl Check {
         .to_string()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::common::Check;
+
+    #[test]
+    fn should_map_icd10_code_as_expected() {
+        assert_eq!(Check::map_icd_code("D39.1"), "C56, D39.1");
+        assert_eq!(Check::map_icd_code("C00"), "C00-C14");
+        assert_eq!(Check::map_icd_code("F79.9"), "Other");
+    }
+}
