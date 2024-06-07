@@ -16,7 +16,8 @@ win-package: win-binary-x86_64
 	cp target/x86_64-pc-windows-gnu/release/$(PROG_NAME).exe $(PROG_NAME)/
 	cp README.md $(PROG_NAME)/
 	cp LICENSE $(PROG_NAME)/
-	zip $(PROG_NAME)-$(TAG)_win64.zip $(PROG_NAME)/*
+	# first try (linux) zip command, then powershell sub command to create ZIP file
+	zip $(PROG_NAME)-$(TAG)_win64.zip $(PROG_NAME)/* || powershell Compress-ARCHIVE $(PROG_NAME) $(PROG_NAME)-$(TAG)_win64.zip
 	rm -rf $(PROG_NAME) || true
 
 .PHONY: linux-package
