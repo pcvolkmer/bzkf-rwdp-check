@@ -1,0 +1,46 @@
+name: Create release and upload assets
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  linuxbuild:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run tests
+        run: cargo test --verbose
+      - run: make linux-package
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          draft: 'true'
+          make_latest: 'true'
+          generate_release_notes: 'true'
+          files: |
+            *linux.tar.gz
+  windowsbuild:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run tests
+        run: cargo test --verbose
+      - run: make win-package
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          draft: 'true'
+          make_latest: 'true'
+          generate_release_notes: 'true'
+          files: |
+            *win64.zip
