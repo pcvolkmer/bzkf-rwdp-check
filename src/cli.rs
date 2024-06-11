@@ -148,6 +148,32 @@ pub enum SubCommand {
         )]
         include_histo_zyto: bool,
     },
+    #[command(about = "Abgleich zwischen LKR-Export-Protokoll und Onkostar-Datenbank")]
+    CheckExport {
+        #[arg(short = 'D', long, help = "Datenbank-Name", default_value = "onkostar")]
+        database: String,
+        #[arg(
+            short = 'h',
+            long,
+            help = "Datenbank-Host",
+            default_value = "localhost"
+        )]
+        host: String,
+        #[arg(short = 'P', long, help = "Datenbank-Host", default_value = "3306")]
+        port: u16,
+        #[arg(
+            short = 'p',
+            long,
+            help = "Passwort. Wenn nicht angegeben, wird danach gefragt"
+        )]
+        password: Option<String>,
+        #[arg(short = 'u', long, help = "Benutzername")]
+        user: String,
+        #[arg(short, long, help = "LKR-Export-Protokoll-Datei")]
+        file: PathBuf,
+        #[arg(long, help = "Exportpaketnummer", default_value = "0")]
+        export_package: u16,
+    },
 }
 
 fn value_is_date(value: &str) -> Result<String, String> {

@@ -50,6 +50,13 @@ impl LkrExportProtocolFile {
 
         Err(())
     }
+
+    pub fn meldungen(&self) -> Vec<Meldung> {
+        self.patients
+            .iter()
+            .flat_map(|patient| patient.meldungen())
+            .collect_vec()
+    }
 }
 
 pub struct Patient {

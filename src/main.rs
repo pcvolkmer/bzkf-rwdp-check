@@ -423,6 +423,50 @@ fn main() -> Result<(), Box<dyn Error>> {
                 ));
             });
         }
+        SubCommand::CheckExport {
+            database,
+            host,
+            password,
+            port,
+            user,
+            file,
+            export_package,
+        } => {
+            let password = request_password_if_none(password);
+
+            let _ = term.write_line(
+                &style(format!(
+                    "Warte auf Daten für den LKR-Export '{}'...",
+                    export_package
+                ))
+                .blue()
+                .to_string(),
+            );
+
+            let db = DatabaseSource::new(&database, &host, &password, port, &user);
+
+            let exported_db_msg = db
+                .exported(export_package)
+                .map_err(|_e| "Fehler bei Zugriff auf die Datenbank")?;
+
+            let xml_file_content = LkrExportProtocolFile::parse_file(file.as_path())
+                .map_err(|_e| "Fehler bei Zugriff auf die Protokolldatei")?;
+
+            let _ = term.clear_last_lines(1);
+
+            if exported_db_msg.len() != xml_file_content.meldungen().len() {
+                let _ = term.write_line(
+                    &style(format!("Nicht übereinstimmende Anzahl an Meldungen:",))
+                        .yellow()
+                        .to_string(),
+                );
+                let _ = term.write_line(&format!(
+                    "Datenbank:      {:>10}\nProtokolldatei: {:>10}",
+                    exported_db_msg.len(),
+                    xml_file_content.meldungen().len()
+                ));
+            }
+        }
     }
 
     Ok(())

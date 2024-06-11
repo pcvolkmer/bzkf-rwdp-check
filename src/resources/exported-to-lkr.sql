@@ -18,8 +18,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-pub const SQL_QUERY: &str = include_str!("query.sql");
-
-pub const EXPORT_QUERY: &str = include_str!("export.sql");
-
-pub const EXPORTED_TO_LKR: &str = include_str!("exported-to-lkr.sql");
+SELECT
+    id,
+    xml_daten
+FROM lkr_meldung_export
+WHERE lkr_export = :export_id OR (0 = :export_id AND lkr_export IN (SELECT MAX(lkr_export) FROM lkr_meldung_export));
