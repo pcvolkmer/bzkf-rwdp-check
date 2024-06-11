@@ -28,10 +28,12 @@ use itertools::Itertools;
 use crate::cli::{Cli, SubCommand};
 use crate::common::{Check, DiffRecord, Icd10GroupSize};
 use crate::database::DatabaseSource;
+use crate::lkrexport::LkrExportProtocolFile;
 
 mod cli;
 mod common;
 mod database;
+mod lkrexport;
 mod opal;
 mod resources;
 
