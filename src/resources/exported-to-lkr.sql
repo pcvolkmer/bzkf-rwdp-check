@@ -22,4 +22,5 @@ SELECT
     CONVERT(id,char) AS id,
     xml_daten
 FROM lkr_meldung_export
-WHERE lkr_export = :export_id OR (0 = :export_id AND lkr_export IN (SELECT MAX(lkr_export) FROM lkr_meldung_export));
+WHERE typ <> -1
+    AND (lkr_export = :export_id OR (0 = :export_id AND lkr_export IN (SELECT MAX(lkr_export) FROM lkr_meldung_export)));
