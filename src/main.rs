@@ -446,13 +446,11 @@ fn main() -> Result<(), Box<dyn Error>> {
 
             let db = DatabaseSource::new(&database, &host, &password, port, &user);
 
-            let db_meldungen = db
+            let db_entries = db
                 .exported(export_package)
                 .map_err(|_e| "Fehler bei Zugriff auf die Datenbank")?;
 
-            let db_row_count = db_meldungen.len();
-
-            let db_meldungen = db_meldungen
+            let db_meldungen = db_entries
                 .iter()
                 .map(|entry| LkrExportProtocolFile::parse(&entry.1))
                 .filter(|entry| entry.is_ok())
@@ -474,7 +472,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             let _ = term.write_line(
                 &style(format!(
                     "{} Datenbankeinträge mit {} Meldungen abgerufen",
-                    db_row_count,
+                    db_entries.len(),
                     db_meldungen.len()
                 ))
                 .green()
@@ -483,7 +481,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
             if db_meldungen.len() != xml_meldungen.len() {
                 let _ = term.write_line(
-                    &style(format!("Nicht übereinstimmende Anzahl an Meldungen:",))
+                    &style("\nNicht übereinstimmende Anzahl an Meldungen:")
                         .yellow()
                         .to_string(),
                 );
@@ -500,7 +498,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
                 if !missing_db_ids.is_empty() {
                     let _ = term.write_line(
-                        &style(format!("In der Datenbank fehlende Meldungen::",))
+                        &style("\nIn der Datenbank fehlende Meldungen:")
                             .yellow()
                             .to_string(),
                     );
@@ -521,7 +519,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
                 if !missing_xml_ids.is_empty() {
                     let _ = term.write_line(
-                        &style(format!("In der Protokolldatei fehlende Meldungen::",))
+                        &style("\nIn der Protokolldatei fehlende Meldungen:")
                             .yellow()
                             .to_string(),
                     );
@@ -534,6 +532,31 @@ fn main() -> Result<(), Box<dyn Error>> {
                         ));
                     });
                 }
+            }
+
+            let multiple_meldung_entries = db_entries
+                .iter()
+                .map(|(lkr_meldung, meldung)| (lkr_meldung, LkrExportProtocolFile::parse(&meldung)))
+                .filter_map(|(lkr_meldung, meldung)| {
+                    if meldung.unwrap().meldungen().len() > 1 {
+                        Some(lkr_meldung)
+                    } else {
+                        None
+                    }
+                })
+                .sorted()
+                .collect_vec();
+
+            if !multiple_meldung_entries.is_empty() {
+                let _ = term.write_line(
+                    &style("\nFolgende Einträge in `lkr_meldung_export` haben mehrere Meldungsinhalte in `xml_daten`:")
+                        .yellow()
+                        .to_string(),
+                );
+
+                multiple_meldung_entries.iter().for_each(|item| {
+                    let _ = term.write_line(&item.to_string());
+                });
             }
         }
     }
