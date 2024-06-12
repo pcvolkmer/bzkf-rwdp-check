@@ -105,28 +105,31 @@ impl Meldung {
         None
     }
 
+    #[allow(unused)]
     pub fn database_id(&self) -> Option<String> {
-        return match self.id() {
-            Some(id) => {
-                let re1 = Regex::new(r"^(?<id>[0-9A-F]+)").unwrap();
-                let re2 = Regex::new(r"(?<id>[0-9]+)$").unwrap();
-
-                if re1.is_match(&id) {
-                    match re1.find(&id).map(|m| m.as_str().to_string()) {
-                        Some(val) => match u64::from_str_radix(&val, 16) {
-                            Ok(val) => Some(val.to_string()),
-                            _ => None,
-                        },
-                        _ => None,
-                    }
-                } else if re2.is_match(&id) {
-                    re2.find(&id).map(|m| m.as_str().to_string())
-                } else {
-                    None
-                }
-            }
+        match self.id() {
+            Some(id) => to_database_id(&id),
             _ => None,
-        };
+        }
+    }
+}
+
+pub fn to_database_id(id: &str) -> Option<String> {
+    let re1 = Regex::new(r"^(?<id>[0-9A-F]+)").unwrap();
+    let re2 = Regex::new(r"(?<id>[0-9]+)$").unwrap();
+
+    if re1.is_match(id) {
+        match re1.find(id).map(|m| m.as_str().to_string()) {
+            Some(val) => match u64::from_str_radix(&val, 16) {
+                Ok(val) => Some(val.to_string()),
+                _ => None,
+            },
+            _ => None,
+        }
+    } else if re2.is_match(id) {
+        re2.find(id).map(|m| m.as_str().to_string())
+    } else {
+        None
     }
 }
 
