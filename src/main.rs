@@ -18,6 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+use std::collections::HashMap;
 use std::error::Error;
 
 use clap::Parser;
@@ -28,7 +29,7 @@ use itertools::Itertools;
 use crate::cli::{Cli, SubCommand};
 use crate::common::{Check, DiffRecord, Icd10GroupSize};
 use crate::database::DatabaseSource;
-use crate::lkrexport::LkrExportProtocolFile;
+use crate::lkrexport::{to_database_id, LkrExportProtocolFile};
 
 mod cli;
 mod common;
@@ -445,16 +446,42 @@ fn main() -> Result<(), Box<dyn Error>> {
 
             let db = DatabaseSource::new(&database, &host, &password, port, &user);
 
-            let exported_db_msg = db
+            let db_meldungen = db
                 .exported(export_package)
                 .map_err(|_e| "Fehler bei Zugriff auf die Datenbank")?;
 
-            let xml_file_content = LkrExportProtocolFile::parse_file(file.as_path())
-                .map_err(|_e| "Fehler bei Zugriff auf die Protokolldatei")?;
+            let db_row_count = db_meldungen.len();
+
+            let db_meldungen = db_meldungen
+                .iter()
+                .map(|entry| LkrExportProtocolFile::parse(&entry.1))
+                .filter(|entry| entry.is_ok())
+                .flat_map(|entry| entry.unwrap().meldungen())
+                .filter(|meldung| meldung.id().is_some())
+                .map(|meldung| (meldung.id().unwrap(), meldung))
+                .collect::<HashMap<_, _>>();
+
+            let xml_meldungen = LkrExportProtocolFile::parse_file(file.as_path())
+                .map_err(|_e| "Fehler bei Zugriff auf die Protokolldatei")?
+                .meldungen()
+                .into_iter()
+                .filter(|meldung| meldung.id().is_some())
+                .map(|meldung| (meldung.id().unwrap(), meldung))
+                .collect::<HashMap<_, _>>();
 
             let _ = term.clear_last_lines(1);
 
-            if exported_db_msg.len() != xml_file_content.meldungen().len() {
+            let _ = term.write_line(
+                &style(format!(
+                    "{} Datenbankeinträge mit {} Meldungen abgerufen",
+                    db_row_count,
+                    db_meldungen.len()
+                ))
+                .green()
+                .to_string(),
+            );
+
+            if db_meldungen.len() != xml_meldungen.len() {
                 let _ = term.write_line(
                     &style(format!("Nicht übereinstimmende Anzahl an Meldungen:",))
                         .yellow()
@@ -462,9 +489,51 @@ fn main() -> Result<(), Box<dyn Error>> {
                 );
                 let _ = term.write_line(&format!(
                     "Datenbank:      {:>10}\nProtokolldatei: {:>10}",
-                    exported_db_msg.len(),
-                    xml_file_content.meldungen().len()
+                    db_meldungen.len(),
+                    xml_meldungen.len()
                 ));
+
+                let missing_db_ids = xml_meldungen
+                    .keys()
+                    .filter(|&key| !db_meldungen.contains_key(key))
+                    .collect_vec();
+
+                if !missing_db_ids.is_empty() {
+                    let _ = term.write_line(
+                        &style(format!("In der Datenbank fehlende Meldungen::",))
+                            .yellow()
+                            .to_string(),
+                    );
+
+                    missing_db_ids.iter().sorted().for_each(|&item| {
+                        let _ = term.write_line(&format!(
+                            "{} ({})",
+                            item,
+                            to_database_id(item).unwrap_or("?".into())
+                        ));
+                    });
+                }
+
+                let missing_xml_ids = db_meldungen
+                    .keys()
+                    .filter(|&key| !xml_meldungen.contains_key(key))
+                    .collect_vec();
+
+                if !missing_xml_ids.is_empty() {
+                    let _ = term.write_line(
+                        &style(format!("In der Protokolldatei fehlende Meldungen::",))
+                            .yellow()
+                            .to_string(),
+                    );
+
+                    missing_xml_ids.iter().sorted().for_each(|&item| {
+                        let _ = term.write_line(&format!(
+                            "{} ({})",
+                            item,
+                            to_database_id(item).unwrap_or("?".into())
+                        ));
+                    });
+                }
             }
         }
     }
