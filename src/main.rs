@@ -536,7 +536,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
             let multiple_meldung_entries = db_entries
                 .iter()
-                .map(|(lkr_meldung, meldung)| (lkr_meldung, LkrExportProtocolFile::parse(&meldung)))
+                .map(|(lkr_meldung, meldung)| (lkr_meldung, LkrExportProtocolFile::parse(meldung)))
                 .filter_map(|(lkr_meldung, meldung)| {
                     if meldung.unwrap().meldungen().len() > 1 {
                         Some(lkr_meldung)
@@ -584,11 +584,15 @@ fn main() -> Result<(), Box<dyn Error>> {
                     .to_string(),
                 );
 
-                different_content.iter().sorted().for_each(|item| {
+                let _ = term.write_line(
+                    "Dies kann auch aufgrund der verwendeten XML-Encodierung auftreten und bedeutet nicht immer eine inhaltliche Abweichung."
+                );
+
+                different_content.iter().sorted().for_each(|id| {
                     let _ = term.write_line(&format!(
                         "{} ({})",
-                        item,
-                        to_database_id(item).unwrap_or("?".into())
+                        id,
+                        to_database_id(id).unwrap_or("?".into())
                     ));
                 });
             }
