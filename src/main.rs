@@ -130,6 +130,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             let _ = term.write_line(
                 &style(format!("Warte auf Daten für das Diagnosejahr {}...", year))
                     .blue()
+                    .bright()
                     .to_string(),
             );
 
@@ -168,6 +169,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             let _ = term.write_line(
                 &style(format!("Warte auf Daten für das Diagnosejahr {}...", year))
                     .blue()
+                    .bright()
                     .to_string(),
             );
 
@@ -229,6 +231,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             let _ = term.write_line(
                 &style(format!("Warte auf Daten für das Diagnosejahr {}...", year))
                     .blue()
+                    .bright()
                     .to_string(),
             );
 
@@ -441,6 +444,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                     export_package
                 ))
                 .blue()
+                .bright()
                 .to_string(),
             );
 
