@@ -175,6 +175,24 @@ mod tests {
     }
 
     #[test]
+    fn should_get_meldung_id() {
+        let actual = LkrExportProtocolFile::parse(include_str!("../testdaten/testdaten_1.xml"));
+
+        assert!(actual.is_ok());
+
+        let patients = actual.unwrap().patients;
+
+        assert_eq!(
+            patients[0].meldungen()[0].id(),
+            Some("TEST1727528".to_string())
+        );
+        assert_eq!(
+            patients[1].meldungen()[0].id(),
+            Some("001A5D50-TEST".to_string())
+        );
+    }
+
+    #[test]
     fn should_get_meldung_database_id() {
         let actual = LkrExportProtocolFile::parse(include_str!("../testdaten/testdaten_1.xml"));
 
