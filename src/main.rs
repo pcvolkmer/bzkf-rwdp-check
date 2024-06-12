@@ -29,7 +29,7 @@ use itertools::Itertools;
 use crate::cli::{Cli, SubCommand};
 use crate::common::{Check, DiffRecord, Icd10GroupSize};
 use crate::database::DatabaseSource;
-use crate::lkrexport::{to_database_id, LkrExportProtocolFile};
+use crate::lkrexport::{to_database_id, LkrExportProtocolFile, Meldung};
 
 mod cli;
 mod common;
@@ -467,6 +467,11 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .map(|meldung| (meldung.id().unwrap(), meldung))
                 .collect::<HashMap<_, _>>();
 
+            let missing_xml_ids = db_meldungen
+                .keys()
+                .filter(|&key| !xml_meldungen.contains_key(key))
+                .collect_vec();
+
             let _ = term.clear_last_lines(1);
 
             let _ = term.write_line(
@@ -512,11 +517,6 @@ fn main() -> Result<(), Box<dyn Error>> {
                     });
                 }
 
-                let missing_xml_ids = db_meldungen
-                    .keys()
-                    .filter(|&key| !xml_meldungen.contains_key(key))
-                    .collect_vec();
-
                 if !missing_xml_ids.is_empty() {
                     let _ = term.write_line(
                         &style("\nIn der Protokolldatei fehlende Meldungen:")
@@ -556,6 +556,40 @@ fn main() -> Result<(), Box<dyn Error>> {
 
                 multiple_meldung_entries.iter().for_each(|item| {
                     let _ = term.write_line(&item.to_string());
+                });
+            }
+
+            let different_content = db_meldungen
+                .iter()
+                .filter(|(id, _)| !missing_xml_ids.contains(id))
+                .filter(|(id, meldung)| {
+                    xml_meldungen
+                        .get(&id.to_string())
+                        .unwrap_or(&Meldung {
+                            raw_value: String::new(),
+                        })
+                        .no_linebreak()
+                        != meldung.no_linebreak()
+                })
+                .map(|(_, meldung)| meldung.id().unwrap_or("?".into()))
+                .collect_vec();
+
+            if !different_content.is_empty() {
+                let _ = term.write_line(
+                    &style(&format!(
+                        "\nFolgende {} Meldungen unterscheiden sich in der Datenbank und der Protokolldatei:",
+                        different_content.len()
+                    ))
+                    .yellow()
+                    .to_string(),
+                );
+
+                different_content.iter().sorted().for_each(|item| {
+                    let _ = term.write_line(&format!(
+                        "{} ({})",
+                        item,
+                        to_database_id(item).unwrap_or("?".into())
+                    ));
                 });
             }
         }

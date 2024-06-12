@@ -124,6 +124,11 @@ impl Meldung {
             _ => None,
         }
     }
+
+    pub fn no_linebreak(&self) -> String {
+        let re = Regex::new(r"\n\s*").unwrap();
+        re.replace_all(&self.raw_value, "").trim().to_string()
+    }
 }
 
 pub fn to_database_id(id: &str) -> Option<String> {
@@ -147,7 +152,7 @@ pub fn to_database_id(id: &str) -> Option<String> {
 
 #[cfg(test)]
 mod tests {
-    use crate::lkrexport::LkrExportProtocolFile;
+    use crate::lkrexport::{LkrExportProtocolFile, Meldung};
 
     #[test]
     fn should_read_xml_file_content() {
@@ -202,6 +207,18 @@ mod tests {
         assert_eq!(
             patients[1].meldungen()[0].icd10(),
             Some("C17.2".to_string())
+        );
+    }
+
+    #[test]
+    fn should_get_meldung_with_trimmed_margin() {
+        let meldung = Meldung {
+            raw_value: "  <Test>\n  <Test2>TestInhalt 3</Test2>\n</Test>\n".into(),
+        };
+
+        assert_eq!(
+            meldung.no_linebreak(),
+            "<Test><Test2>TestInhalt 3</Test2></Test>".to_string()
         );
     }
 }
