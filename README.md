@@ -99,3 +99,11 @@ Die Anwendung kann auch die Conditions in der CSV-Datei mit der Onkostar-Datenba
 
 Hierzu kann der Befehl `compare` genutzt werden. Dieser verwendet alle Optionen für die Datenbank und die
 Option `--file` für die CSV-Datei und gibt eine Übersicht auf der Konsole aus.
+
+## Vergleich der XML-basierten LKR-Export-Protokolldatei mit der Datenbank
+
+Mithilfe dieser Anwendung kann auch der aktuelle Inhalt der Datenbank gegen die LKR-Export-Protokolldatei für einen
+Export verglichen werden.
+
+Der Befehl `check-export` kann zusammen mit der Angabe der Protokolldatei (`--file`) und der Angabe des
+Exports (`--export-package=...`) und den Optionen für den Datenbankzugriff ausgeführt werden.

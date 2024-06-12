@@ -18,6 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+use std::collections::HashMap;
 use std::error::Error;
 
 use clap::Parser;
@@ -28,10 +29,12 @@ use itertools::Itertools;
 use crate::cli::{Cli, SubCommand};
 use crate::common::{Check, DiffRecord, Icd10GroupSize};
 use crate::database::DatabaseSource;
+use crate::lkrexport::{to_database_id, LkrExportProtocolFile, Meldung};
 
 mod cli;
 mod common;
 mod database;
+mod lkrexport;
 mod opal;
 mod resources;
 
@@ -420,6 +423,179 @@ fn main() -> Result<(), Box<dyn Error>> {
                     }
                 ));
             });
+        }
+        SubCommand::CheckExport {
+            database,
+            host,
+            password,
+            port,
+            user,
+            file,
+            export_package,
+        } => {
+            let password = request_password_if_none(password);
+
+            let _ = term.write_line(
+                &style(format!(
+                    "Warte auf Daten für den LKR-Export '{}'...",
+                    export_package
+                ))
+                .blue()
+                .to_string(),
+            );
+
+            let db = DatabaseSource::new(&database, &host, &password, port, &user);
+
+            let db_entries = db
+                .exported(export_package)
+                .map_err(|_e| "Fehler bei Zugriff auf die Datenbank")?;
+
+            let db_meldungen = db_entries
+                .iter()
+                .map(|entry| LkrExportProtocolFile::parse(&entry.1))
+                .filter(|entry| entry.is_ok())
+                .flat_map(|entry| entry.unwrap().meldungen())
+                .filter(|meldung| meldung.id().is_some())
+                .map(|meldung| (meldung.id().unwrap(), meldung))
+                .collect::<HashMap<_, _>>();
+
+            let xml_meldungen = LkrExportProtocolFile::parse_file(file.as_path())
+                .map_err(|_e| "Fehler bei Zugriff auf die Protokolldatei")?
+                .meldungen()
+                .into_iter()
+                .filter(|meldung| meldung.id().is_some())
+                .map(|meldung| (meldung.id().unwrap(), meldung))
+                .collect::<HashMap<_, _>>();
+
+            let missing_xml_ids = db_meldungen
+                .keys()
+                .filter(|&key| !xml_meldungen.contains_key(key))
+                .collect_vec();
+
+            let _ = term.clear_last_lines(1);
+
+            let _ = term.write_line(
+                &style(format!(
+                    "{} Datenbankeinträge mit {} Meldungen abgerufen",
+                    db_entries.len(),
+                    db_meldungen.len()
+                ))
+                .green()
+                .to_string(),
+            );
+
+            if db_meldungen.len() != xml_meldungen.len() {
+                let _ = term.write_line(
+                    &style("\nNicht übereinstimmende Anzahl an Meldungen:")
+                        .yellow()
+                        .to_string(),
+                );
+                let _ = term.write_line(&format!(
+                    "Datenbank:      {:>10}\nProtokolldatei: {:>10}",
+                    db_meldungen.len(),
+                    xml_meldungen.len()
+                ));
+
+                let missing_db_ids = xml_meldungen
+                    .keys()
+                    .filter(|&key| !db_meldungen.contains_key(key))
+                    .collect_vec();
+
+                if !missing_db_ids.is_empty() {
+                    let _ = term.write_line(
+                        &style("\nIn der Datenbank fehlende Meldungen:")
+                            .yellow()
+                            .to_string(),
+                    );
+
+                    missing_db_ids.iter().sorted().for_each(|&item| {
+                        let _ = term.write_line(&format!(
+                            "{} ({})",
+                            item,
+                            to_database_id(item).unwrap_or("?".into())
+                        ));
+                    });
+                }
+
+                if !missing_xml_ids.is_empty() {
+                    let _ = term.write_line(
+                        &style("\nIn der Protokolldatei fehlende Meldungen:")
+                            .yellow()
+                            .to_string(),
+                    );
+
+                    missing_xml_ids.iter().sorted().for_each(|&item| {
+                        let _ = term.write_line(&format!(
+                            "{} ({})",
+                            item,
+                            to_database_id(item).unwrap_or("?".into())
+                        ));
+                    });
+                }
+            }
+
+            let multiple_meldung_entries = db_entries
+                .iter()
+                .map(|(lkr_meldung, meldung)| (lkr_meldung, LkrExportProtocolFile::parse(meldung)))
+                .filter_map(|(lkr_meldung, meldung)| {
+                    if meldung.unwrap().meldungen().len() > 1 {
+                        Some(lkr_meldung)
+                    } else {
+                        None
+                    }
+                })
+                .sorted()
+                .collect_vec();
+
+            if !multiple_meldung_entries.is_empty() {
+                let _ = term.write_line(
+                    &style("\nFolgende Einträge in `lkr_meldung_export` haben mehrere Meldungsinhalte in `xml_daten`:")
+                        .yellow()
+                        .to_string(),
+                );
+
+                multiple_meldung_entries.iter().for_each(|item| {
+                    let _ = term.write_line(&item.to_string());
+                });
+            }
+
+            let different_content = db_meldungen
+                .iter()
+                .filter(|(id, _)| !missing_xml_ids.contains(id))
+                .filter(|(id, meldung)| {
+                    xml_meldungen
+                        .get(&id.to_string())
+                        .unwrap_or(&Meldung {
+                            raw_value: String::new(),
+                        })
+                        .no_linebreak()
+                        != meldung.no_linebreak()
+                })
+                .map(|(_, meldung)| meldung.id().unwrap_or("?".into()))
+                .collect_vec();
+
+            if !different_content.is_empty() {
+                let _ = term.write_line(
+                    &style(&format!(
+                        "\nFolgende {} Meldungen unterscheiden sich in der Datenbank und der Protokolldatei:",
+                        different_content.len()
+                    ))
+                    .yellow()
+                    .to_string(),
+                );
+
+                let _ = term.write_line(
+                    "Dies kann auch aufgrund der verwendeten XML-Encodierung auftreten und bedeutet nicht immer eine inhaltliche Abweichung."
+                );
+
+                different_content.iter().sorted().for_each(|id| {
+                    let _ = term.write_line(&format!(
+                        "{} ({})",
+                        id,
+                        to_database_id(id).unwrap_or("?".into())
+                    ));
+                });
+            }
         }
     }
 

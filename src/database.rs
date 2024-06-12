@@ -24,7 +24,7 @@ use mysql::prelude::Queryable;
 use mysql::{params, Pool};
 
 use crate::common::{ExportData, Icd10GroupSize};
-use crate::resources::{EXPORT_QUERY, SQL_QUERY};
+use crate::resources::{EXPORTED_TO_LKR, EXPORT_QUERY, SQL_QUERY};
 
 pub struct DatabaseSource(String);
 
@@ -96,6 +96,32 @@ impl DatabaseSource {
                             diagnosis_date,
                             pat_id: if use_pat_id { Some(pat_id) } else { None },
                         },
+                    ) {
+                        Ok(result) => Ok(result),
+                        Err(_) => {
+                            return Err(());
+                        }
+                    };
+                }
+            }
+            Err(_) => {
+                return Err(());
+            }
+        }
+
+        Err(())
+    }
+
+    pub fn exported(&self, export_id: u16) -> Result<Vec<(String, String)>, ()> {
+        match Pool::new(self.0.as_str()) {
+            Ok(pool) => {
+                if let Ok(mut connection) = pool.try_get_conn(Duration::from_secs(3)) {
+                    return match connection.exec_map(
+                        EXPORTED_TO_LKR,
+                        params! {
+                            "export_id" => export_id,
+                        },
+                        |(id, xml_data)| (id, xml_data),
                     ) {
                         Ok(result) => Ok(result),
                         Err(_) => {
