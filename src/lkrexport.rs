@@ -93,6 +93,7 @@ impl FromStr for Meldung {
     }
 }
 
+#[allow(unused)]
 impl Meldung {
     pub fn id(&self) -> Option<String> {
         let re = Regex::new(r#"Meldung_ID="(?<meldung_id>(.*?))""#).unwrap();
@@ -105,7 +106,18 @@ impl Meldung {
         None
     }
 
-    #[allow(unused)]
+    pub fn icd10(&self) -> Option<String> {
+        let re = Regex::new(r"(?s)<Primaertumor_ICD_Code>(?<icd10>(.*?))</Primaertumor_ICD_Code>")
+            .unwrap();
+
+        if re.is_match(&self.raw_value) {
+            let caps = re.captures(&self.raw_value).unwrap();
+            return Some(caps["icd10"].to_string());
+        }
+
+        None
+    }
+
     pub fn database_id(&self) -> Option<String> {
         match self.id() {
             Some(id) => to_database_id(&id),
@@ -172,6 +184,24 @@ mod tests {
         assert_eq!(
             patients[1].meldungen()[0].database_id(),
             Some("1727824".to_string())
+        );
+    }
+
+    #[test]
+    fn should_get_meldung_icd10() {
+        let actual = LkrExportProtocolFile::parse(include_str!("../testdaten/testdaten_1.xml"));
+
+        assert!(actual.is_ok());
+
+        let patients = actual.unwrap().patients;
+
+        assert_eq!(
+            patients[0].meldungen()[0].icd10(),
+            Some("C17.1".to_string())
+        );
+        assert_eq!(
+            patients[1].meldungen()[0].icd10(),
+            Some("C17.2".to_string())
         );
     }
 }

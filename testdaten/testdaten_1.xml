@@ -31,7 +31,7 @@
                     <Meldebegruendung>I</Meldebegruendung>
                     <Meldeanlass>statusaenderung</Meldeanlass>
                     <Tumorzuordnung Tumor_ID="1">
-                        <Primaertumor_ICD_Code>C17.2</Primaertumor_ICD_Code>
+                        <Primaertumor_ICD_Code>C17.1</Primaertumor_ICD_Code>
                         <Primaertumor_ICD_Version>10 2015 GM</Primaertumor_ICD_Version>
                         <Diagnosedatum>10.06.2024</Diagnosedatum>
                         <Seitenlokalisation>T</Seitenlokalisation>
