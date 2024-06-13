@@ -24,7 +24,23 @@ use mysql::prelude::Queryable;
 use mysql::{params, Pool};
 
 use crate::common::{ExportData, Icd10GroupSize};
-use crate::resources::{EXPORTED_TO_LKR, EXPORT_QUERY, SQL_QUERY};
+use crate::resources::{EXPORTED_TO_LKR, EXPORT_QUERY, SQL_QUERY, SQL_QUERY_WITH_SCHEMA_VERSION};
+
+fn result_mapper() -> fn((String, String, usize)) -> Icd10GroupSize {
+    |(icd10_group, _, count)| Icd10GroupSize {
+        name: icd10_group,
+        schema_version: None,
+        size: count,
+    }
+}
+
+fn result_mapper_with_schema_version() -> fn((String, String, usize)) -> Icd10GroupSize {
+    |(icd10_group, schema_version, count)| Icd10GroupSize {
+        name: icd10_group,
+        schema_version: Some(schema_version),
+        size: count,
+    }
+}
 
 pub struct DatabaseSource(String);
 
@@ -41,25 +57,31 @@ impl DatabaseSource {
         ignore_exports_since: &str,
         include_extern: bool,
         include_histo_zyto: bool,
+        schema_versions: bool,
     ) -> Result<Vec<Icd10GroupSize>, ()> {
+        let params = params! {
+            "year" => year,
+            "ignore_exports_since" => ignore_exports_since,
+            "include_extern" => if include_extern { 1 } else { 0 },
+            "include_histo_zyto" => if include_histo_zyto { 1 } else { 0 }
+        };
+
         match Pool::new(self.0.as_str()) {
             Ok(pool) => {
                 if let Ok(mut connection) = pool.try_get_conn(Duration::from_secs(3)) {
-                    return match connection.exec_map(
-                        SQL_QUERY,
-                        params! {
-                            "year" => year,
-                            "ignore_exports_since" => ignore_exports_since,
-                            "include_extern" => if include_extern { 1 } else { 0 },
-                            "include_histo_zyto" => if include_histo_zyto { 1 } else { 0 }
+                    return match schema_versions {
+                        true => match connection.exec_map(
+                            SQL_QUERY_WITH_SCHEMA_VERSION,
+                            params,
+                            result_mapper_with_schema_version(),
+                        ) {
+                            Ok(result) => Ok(result),
+                            Err(_) => Err(()),
                         },
-                        |(icd10_group, count)| Icd10GroupSize {
-                            name: icd10_group,
-                            size: count,
+                        false => match connection.exec_map(SQL_QUERY, params, result_mapper()) {
+                            Ok(result) => Ok(result),
+                            Err(_) => Err(()),
                         },
-                    ) {
-                        Ok(result) => Ok(result),
-                        Err(_) => Err(()),
                     };
                 }
             }

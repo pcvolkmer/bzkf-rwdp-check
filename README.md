@@ -67,9 +67,13 @@ Dies eignet sich um nachträglich Zahlen zu einem bestimmten Datum zu ermitteln.
 
 Der optionale Parameter `--include-extern` schließt Meldungen mit externer Diagnosestellung ein.
 Diese sind normalerweise nicht enthalten.
+Die Entscheidung, ob eine Meldung intern oder extern gemeldet wird, wird anhand der `Melder_ID` getroffen.
+Enthält diese die Zeichenkette `9999` wird von einer externen Meldung ausgegangen.
 
 Der optionale Parameter `--include-histo-zyto` schließt Meldungen mit Meldeanlass `histologhie_zytologie` ein.
 Diese sind normalerweise ebenfalls nicht enthalten.
+
+Mit dem optionalen Parameter `--schema-versions` werden die Angaben zudem noch oBDS-Schema-Version getrennt ausgegeben.
 
 ## Export aus der Onkostar-Datenbank
 
