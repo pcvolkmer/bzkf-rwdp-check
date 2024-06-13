@@ -592,13 +592,20 @@ fn main() -> Result<(), Box<dyn Error>> {
                     "Dies kann auch aufgrund der verwendeten XML-Encodierung auftreten und bedeutet nicht immer eine inhaltliche Abweichung."
                 );
 
-                different_content.iter().sorted().for_each(|id| {
-                    let _ = term.write_line(&format!(
-                        "{} ({})",
-                        id,
-                        to_database_id(id).unwrap_or("?".into())
-                    ));
-                });
+                different_content
+                    .iter()
+                    .sorted_by(|id1, id2| {
+                        to_database_id(id1)
+                            .unwrap_or_default()
+                            .cmp(&to_database_id(id2).unwrap_or_default())
+                    })
+                    .for_each(|id| {
+                        let _ = term.write_line(&format!(
+                            "{} ({})",
+                            id,
+                            to_database_id(id).unwrap_or("?".into())
+                        ));
+                    });
             }
         }
     }
