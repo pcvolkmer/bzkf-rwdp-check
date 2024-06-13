@@ -69,6 +69,8 @@ pub enum SubCommand {
             help = "Meldungen mit Meldeanlass 'histologie_zytologie' einschließen"
         )]
         include_histo_zyto: bool,
+        #[arg(long, help = "Meldungen mit oBDS-Schema-version anzeigen")]
+        schema_versions: bool,
     },
     #[command(
         about = "Erstellt eine (reduzierte) CSV-Datei zum direkten Vergleich mit der OPAL-CSV-Datei"

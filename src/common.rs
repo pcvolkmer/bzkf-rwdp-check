@@ -23,6 +23,7 @@ use serde::{Deserialize, Serialize};
 
 pub struct Icd10GroupSize {
     pub name: String,
+    pub schema_version: Option<String>,
     pub size: usize,
 }
 
@@ -68,6 +69,7 @@ impl Check {
             .map(|(icd10, group)| (icd10, group.collect::<Vec<_>>()))
             .map(|record| Icd10GroupSize {
                 name: record.0,
+                schema_version: None,
                 size: record.1.len(),
             })
             .collect::<Vec<_>>();

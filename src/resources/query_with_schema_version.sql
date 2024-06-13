@@ -107,7 +107,7 @@ SELECT CASE
 
            ELSE 'Other'
            END AS ICD10_GROUP,
-       '' AS schema_version,
+       schema_version,
        COUNT(*) as COUNT
 FROM (
     SELECT DISTINCT
@@ -137,4 +137,4 @@ LEFT OUTER JOIN (
 ) o2
 ON (o1.cond_id = o2.cond_id AND o1.versionsnummer < max_version)
 WHERE diagnosejahr = :year AND o2.cond_id IS NULL
-GROUP BY ICD10_GROUP;
+GROUP BY ICD10_GROUP, schema_version;

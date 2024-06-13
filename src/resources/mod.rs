@@ -20,6 +20,8 @@
 
 pub const SQL_QUERY: &str = include_str!("query.sql");
 
+pub const SQL_QUERY_WITH_SCHEMA_VERSION: &str = include_str!("query_with_schema_version.sql");
+
 pub const EXPORT_QUERY: &str = include_str!("export.sql");
 
 pub const EXPORTED_TO_LKR: &str = include_str!("exported-to-lkr.sql");
