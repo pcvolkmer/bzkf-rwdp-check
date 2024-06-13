@@ -125,9 +125,22 @@ impl Meldung {
         }
     }
 
-    pub fn no_linebreak(&self) -> String {
+    pub fn sanitized_xml_string(&self) -> String {
         let re = Regex::new(r"\n\s*").unwrap();
-        re.replace_all(&self.raw_value, "").trim().to_string()
+        let content = re.replace_all(&self.raw_value, "").trim().to_string();
+
+        let re = Regex::new(r"<[^>]+/>").unwrap();
+        if re.is_match(&content) {
+            let mut c = content.to_string();
+            re.find_iter(&content)
+                .map(|m| m.as_str().to_string().replace('<', "").replace("/>", ""))
+                .for_each(|tag| {
+                    c = c.replace(&format!("<{}/>", tag), &format!("<{}></{}>", tag, tag));
+                });
+            return c;
+        }
+
+        content
     }
 }
 
@@ -235,8 +248,23 @@ mod tests {
         };
 
         assert_eq!(
-            meldung.no_linebreak(),
+            meldung.sanitized_xml_string(),
             "<Test><Test2>TestInhalt 3</Test2></Test>".to_string()
+        );
+    }
+
+    #[test]
+    fn should_get_meldung_without_self_closing_tags() {
+        let meldung = Meldung {
+            raw_value:
+                "  <Test>\n  <Test2/>\n  <Content>Test</Content>\n  <Test3/>\n  <Test2/>\n</Test>\n"
+                    .into(),
+        };
+
+        assert_eq!(
+            meldung.sanitized_xml_string(),
+            "<Test><Test2></Test2><Content>Test</Content><Test3></Test3><Test2></Test2></Test>"
+                .to_string()
         );
     }
 }

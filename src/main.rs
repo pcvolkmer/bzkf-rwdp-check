@@ -572,8 +572,8 @@ fn main() -> Result<(), Box<dyn Error>> {
                         .unwrap_or(&Meldung {
                             raw_value: String::new(),
                         })
-                        .no_linebreak()
-                        != meldung.no_linebreak()
+                        .sanitized_xml_string()
+                        != meldung.sanitized_xml_string()
                 })
                 .map(|(_, meldung)| meldung.id().unwrap_or("?".into()))
                 .collect_vec();
