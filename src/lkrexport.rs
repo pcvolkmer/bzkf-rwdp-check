@@ -126,7 +126,7 @@ impl Meldung {
     }
 
     pub fn sanitized_xml_string(&self) -> String {
-        let re = Regex::new(r"\n\s*").unwrap();
+        let re = Regex::new(r"[\r|\n]+\s*").unwrap();
         let content = re.replace_all(&self.raw_value, "").trim().to_string();
 
         let re = Regex::new(r"<[^>]+/>").unwrap();
