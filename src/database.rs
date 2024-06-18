@@ -134,14 +134,14 @@ impl DatabaseSource {
         Err(())
     }
 
-    pub fn exported(&self, export_id: u16) -> Result<Vec<(String, String)>, ()> {
+    pub fn exported(&self, package: u16) -> Result<Vec<(String, String)>, ()> {
         match Pool::new(self.0.as_str()) {
             Ok(pool) => {
                 if let Ok(mut connection) = pool.try_get_conn(Duration::from_secs(3)) {
                     return match connection.exec_map(
                         EXPORTED_TO_LKR,
                         params! {
-                            "export_id" => export_id,
+                            "export_id" => package,
                         },
                         |(id, xml_data)| (id, xml_data),
                     ) {

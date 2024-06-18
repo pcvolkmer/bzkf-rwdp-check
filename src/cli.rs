@@ -173,8 +173,8 @@ pub enum SubCommand {
         user: String,
         #[arg(short, long, help = "LKR-Export-Protokoll-Datei")]
         file: PathBuf,
-        #[arg(long, help = "Exportpaketnummer", default_value = "0")]
-        export_package: u16,
+        #[arg(long, alias = "export-package", help = "Exportpaketnummer", default_value = "0")]
+        package: u16,
     },
 }
 

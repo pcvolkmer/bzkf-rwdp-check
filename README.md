@@ -110,4 +110,4 @@ Mithilfe dieser Anwendung kann auch der aktuelle Inhalt der Datenbank gegen die 
 Export verglichen werden.
 
 Der Befehl `check-export` kann zusammen mit der Angabe der Protokolldatei (`--file`) und der Angabe des
-Exports (`--export-package=...`) und den Optionen für den Datenbankzugriff ausgeführt werden.
+Exports (`--package=...` bzw. `--export-package=...`) und den Optionen für den Datenbankzugriff ausgeführt werden.

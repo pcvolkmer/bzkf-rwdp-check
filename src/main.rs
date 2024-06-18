@@ -444,14 +444,14 @@ fn main() -> Result<(), Box<dyn Error>> {
             port,
             user,
             file,
-            export_package,
+            package,
         } => {
             let password = request_password_if_none(password);
 
             let _ = term.write_line(
                 &style(format!(
                     "Warte auf Daten für den LKR-Export '{}'...",
-                    export_package
+                    package
                 ))
                 .blue()
                 .bright()
@@ -461,7 +461,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             let db = DatabaseSource::new(&database, &host, &password, port, &user);
 
             let db_entries = db
-                .exported(export_package)
+                .exported(package)
                 .map_err(|_e| "Fehler bei Zugriff auf die Datenbank")?;
 
             let db_meldungen = db_entries
