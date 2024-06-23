@@ -51,9 +51,9 @@ fn request_password_if_none(password: Option<String>) -> String {
     }
 }
 
-fn sanitize_year(year: String) -> String {
+fn sanitize_year(year: &str) -> String {
     if year.len() == 4 {
-        year
+        year.to_string()
     } else {
         format!("2{:0>3}", year)
     }
@@ -134,7 +134,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             schema_versions,
         } => {
             let password = request_password_if_none(password);
-            let year = sanitize_year(year);
+            let year = sanitize_year(&year);
 
             let _ = term.write_line(
                 &style(format!("Warte auf Daten für das Diagnosejahr {}...", year))
@@ -174,7 +174,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             include_histo_zyto,
         } => {
             let password = request_password_if_none(password);
-            let year = sanitize_year(year);
+            let year = sanitize_year(&year);
 
             let _ = term.write_line(
                 &style(format!("Warte auf Daten für das Diagnosejahr {}...", year))
@@ -236,7 +236,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             include_histo_zyto,
         } => {
             let password = request_password_if_none(password);
-            let year = sanitize_year(year);
+            let year = sanitize_year(&year);
 
             let _ = term.write_line(
                 &style(format!("Warte auf Daten für das Diagnosejahr {}...", year))
