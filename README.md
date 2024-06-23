@@ -111,3 +111,7 @@ Export verglichen werden.
 
 Der Befehl `check-export` kann zusammen mit der Angabe der Protokolldatei (`--file`) und der Angabe des
 Exports (`--package=...` bzw. `--export-package=...`) und den Optionen für den Datenbankzugriff ausgeführt werden.
+
+Zur Überprüfung werden irrelevante Leerzeichen und Zeilenumbrüche entfernt und _Self-Closed-Tags_ ersetzt
+(`<Meldeanlass />` => `<Meldeanlass></Meldeanlass>`),
+da in Onkostar in der Datenbank und der LKR-Export-Protokolldatei verschiedene Formatierungen verwendet werden (können).
