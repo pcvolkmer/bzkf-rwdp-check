@@ -263,7 +263,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
             let mut not_in_csv = db_items
                 .iter()
-                .filter(|db_item| {
+                .filter(|&db_item| {
                     !csv_items
                         .iter()
                         .map(|csv_item| &csv_item.condition_id)
@@ -293,7 +293,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
             not_in_csv
                 .iter()
-                .for_each(|item| match Check::is_relevant(&item.icd_10_code) {
+                .for_each(|&item| match Check::is_relevant(&item.icd_10_code) {
                     true => {
                         let _ = term.write_line(&format!(
                             "{:<64}   {:<10}   {:<5}   {:<5}   {}",
@@ -324,7 +324,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
             let mut not_in_db = csv_items
                 .iter()
-                .filter(|csv_item| {
+                .filter(|&csv_item| {
                     !db_items
                         .iter()
                         .map(|db_item| &db_item.condition_id)
@@ -568,7 +568,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                         .to_string(),
                 );
 
-                multiple_meldung_entries.iter().for_each(|item| {
+                multiple_meldung_entries.iter().for_each(|&item| {
                     let _ = term.write_line(&item.to_string());
                 });
             }
@@ -604,7 +604,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
                 different_content
                     .iter()
-                    .sorted_by(|id1, id2| {
+                    .sorted_by(|&id1, &id2| {
                         to_database_id(id1)
                             .unwrap_or_default()
                             .cmp(&to_database_id(id2).unwrap_or_default())
