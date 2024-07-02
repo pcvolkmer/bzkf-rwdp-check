@@ -33,11 +33,12 @@ FROM (
         SUBSTRING_INDEX(EXTRACTVALUE(lm.xml_daten, '//Diagnosedatum'), ' ', 1) AS diagnosedatum,
         SUBSTRING_INDEX(SUBSTRING_INDEX(EXTRACTVALUE(lm.xml_daten, '//Diagnosedatum'), ' ', 1), '.', -1) AS diagnosejahr
     FROM lkr_meldung_export lme
-    JOIN lkr_meldung lm ON (lm.id = lme.lkr_meldung AND lme.typ <> '-1' AND lm.extern <= :include_extern)
     WHERE lm.xml_daten LIKE '%ICD_Version%'
-        AND SUBSTRING_INDEX(SUBSTRING_INDEX(EXTRACTVALUE(lm.xml_daten, '//Diagnosedatum'), ' ', 1), '.', -1) = :year
-        AND (lm.xml_daten LIKE '%<cTNM%' OR lm.xml_daten LIKE '%<pTNM%' OR lm.xml_daten LIKE '%<Menge_Histologie>%' OR lm.xml_daten LIKE '%<Menge_Weitere_Klassifikation>%')
-        AND (lm.xml_daten NOT LIKE '%histologie_zytologie%' OR 1 = :include_histo_zyto)
+        AND lme.typ <> -1
+        AND SUBSTRING_INDEX(SUBSTRING_INDEX(EXTRACTVALUE(lme.xml_daten, '//Diagnosedatum'), ' ', 1), '.', -1) = :year
+        AND (lme.xml_daten LIKE '%<cTNM%' OR lme.xml_daten LIKE '%<pTNM%' OR lme.xml_daten LIKE '%<Menge_Histologie>%' OR lme.xml_daten LIKE '%<Menge_Weitere_Klassifikation>%')
+        AND (lme.xml_daten NOT LIKE '%histologie_zytologie%' OR 1 = :include_histo_zyto)
+        AND (EXTRACTVALUE(lme.xml_daten, '//Meldende_Stelle') NOT LIKE '%9999%' OR 1 <= :include_extern)
     ) o1
     LEFT OUTER JOIN (
 
