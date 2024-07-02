@@ -29,11 +29,11 @@ FROM (
         EXTRACTVALUE(lme.xml_daten, '//Patienten_Stammdaten/@Patient_ID') AS pid,
         lme.versionsnummer,
         SHA2(CONCAT('https://fhir.diz.uk-erlangen.de/identifiers/onkostar-xml-condition-id|', EXTRACTVALUE(lme.xml_daten, '//Patienten_Stammdaten/@Patient_ID'), 'condition', EXTRACTVALUE(lme.xml_daten, '//Diagnose/@Tumor_ID')), 256) AS cond_id,
-        SUBSTRING_INDEX(EXTRACTVALUE(lm.xml_daten, '//Primaertumor_ICD_Code'), ' ', 1) AS condcodingcode,
-        SUBSTRING_INDEX(EXTRACTVALUE(lm.xml_daten, '//Diagnosedatum'), ' ', 1) AS diagnosedatum,
-        SUBSTRING_INDEX(SUBSTRING_INDEX(EXTRACTVALUE(lm.xml_daten, '//Diagnosedatum'), ' ', 1), '.', -1) AS diagnosejahr
+        SUBSTRING_INDEX(EXTRACTVALUE(lme.xml_daten, '//Primaertumor_ICD_Code'), ' ', 1) AS condcodingcode,
+        SUBSTRING_INDEX(EXTRACTVALUE(lme.xml_daten, '//Diagnosedatum'), ' ', 1) AS diagnosedatum,
+        SUBSTRING_INDEX(SUBSTRING_INDEX(EXTRACTVALUE(lme.xml_daten, '//Diagnosedatum'), ' ', 1), '.', -1) AS diagnosejahr
     FROM lkr_meldung_export lme
-    WHERE lm.xml_daten LIKE '%ICD_Version%'
+    WHERE lme.xml_daten LIKE '%ICD_Version%'
         AND lme.typ <> -1
         AND SUBSTRING_INDEX(SUBSTRING_INDEX(EXTRACTVALUE(lme.xml_daten, '//Diagnosedatum'), ' ', 1), '.', -1) = :year
         AND (lme.xml_daten LIKE '%<cTNM%' OR lme.xml_daten LIKE '%<pTNM%' OR lme.xml_daten LIKE '%<Menge_Histologie>%' OR lme.xml_daten LIKE '%<Menge_Weitere_Klassifikation>%')
