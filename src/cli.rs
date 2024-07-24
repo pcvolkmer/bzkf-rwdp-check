@@ -62,6 +62,8 @@ pub enum SubCommand {
         year: String,
         #[arg(long, value_parser = value_is_date, help = "Ignoriere LKR-Exporte seit Datum")]
         ignore_exports_since: Option<String>,
+        #[arg(long, help = "Ignoriere Meldungen, die nicht im oBDS 2.x Format sind")]
+        ignore_non_obds_2: bool,
         #[arg(long, help = "Meldungen mit externer Diagnose einschließen")]
         include_extern: bool,
         #[arg(
@@ -103,6 +105,8 @@ pub enum SubCommand {
         year: String,
         #[arg(long, value_parser = value_is_date, help = "Ignoriere LKR-Exporte seit Datum")]
         ignore_exports_since: Option<String>,
+        #[arg(long, help = "Ignoriere Meldungen, die nicht im oBDS 2.x Format sind")]
+        ignore_non_obds_2: bool,
         #[arg(long, help = "Export mit Trennzeichen ';' für Excel")]
         xls_csv: bool,
         #[arg(long, help = "Meldungen mit externer Diagnose einschließen")]
@@ -142,6 +146,8 @@ pub enum SubCommand {
         year: String,
         #[arg(long, value_parser = value_is_date, help = "Ignoriere LKR-Exporte seit Datum")]
         ignore_exports_since: Option<String>,
+        #[arg(long, help = "Ignoriere Meldungen, die nicht im oBDS 2.x Format sind")]
+        ignore_non_obds_2: bool,
         #[arg(long, help = "Meldungen mit externer Diagnose einschließen")]
         include_extern: bool,
         #[arg(

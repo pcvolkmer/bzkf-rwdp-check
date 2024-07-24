@@ -129,6 +129,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             user,
             year,
             ignore_exports_since,
+            ignore_non_obds_2,
             include_extern,
             include_histo_zyto,
             schema_versions,
@@ -148,6 +149,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .check(
                     &year,
                     &ignore_exports_since.unwrap_or("9999-12-31".into()),
+                    ignore_non_obds_2,
                     include_extern,
                     include_histo_zyto,
                     schema_versions,
@@ -169,6 +171,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             output,
             year,
             ignore_exports_since,
+            ignore_non_obds_2,
             xls_csv,
             include_extern,
             include_histo_zyto,
@@ -188,6 +191,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .export(
                     &year,
                     &ignore_exports_since.unwrap_or("9999-12-31".into()),
+                    ignore_non_obds_2,
                     pat_id,
                     include_extern,
                     include_histo_zyto,
@@ -232,6 +236,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             file,
             year,
             ignore_exports_since,
+            ignore_non_obds_2,
             include_extern,
             include_histo_zyto,
         } => {
@@ -250,6 +255,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .export(
                     &year,
                     &ignore_exports_since.unwrap_or("9999-12-31".into()),
+                    ignore_non_obds_2,
                     pat_id,
                     include_extern,
                     include_histo_zyto,
@@ -498,6 +504,16 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .to_string(),
             );
 
+            fn print_missing_ids(missing_ids: &[&String], term: &Term) {
+                missing_ids.iter().sorted().for_each(|&item| {
+                    let _ = term.write_line(&format!(
+                        "{} ({})",
+                        item,
+                        to_database_id(item).unwrap_or("?".into())
+                    ));
+                });
+            }
+
             if db_meldungen.len() != xml_meldungen.len() {
                 let _ = term.write_line(
                     &style("\nNicht übereinstimmende Anzahl an Meldungen:")
@@ -522,13 +538,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                             .to_string(),
                     );
 
-                    missing_db_ids.iter().sorted().for_each(|&item| {
-                        let _ = term.write_line(&format!(
-                            "{} ({})",
-                            item,
-                            to_database_id(item).unwrap_or("?".into())
-                        ));
-                    });
+                    print_missing_ids(&missing_db_ids, &term);
                 }
 
                 if !missing_xml_ids.is_empty() {
@@ -538,13 +548,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                             .to_string(),
                     );
 
-                    missing_xml_ids.iter().sorted().for_each(|&item| {
-                        let _ = term.write_line(&format!(
-                            "{} ({})",
-                            item,
-                            to_database_id(item).unwrap_or("?".into())
-                        ));
-                    });
+                    print_missing_ids(&missing_xml_ids, &term);
                 }
             }
 
