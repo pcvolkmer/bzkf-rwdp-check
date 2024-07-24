@@ -55,6 +55,7 @@ impl DatabaseSource {
         &self,
         year: &str,
         ignore_exports_since: &str,
+        ignore_non_obds_2: bool,
         include_extern: bool,
         include_histo_zyto: bool,
         schema_versions: bool,
@@ -62,6 +63,7 @@ impl DatabaseSource {
         let params = params! {
             "year" => year,
             "ignore_exports_since" => ignore_exports_since,
+            "ignore_non_obds_2" => if ignore_non_obds_2 { 1 } else { 0 },
             "include_extern" => if include_extern { 1 } else { 0 },
             "include_histo_zyto" => if include_histo_zyto { 1 } else { 0 }
         };
@@ -97,6 +99,7 @@ impl DatabaseSource {
         &self,
         year: &str,
         ignore_exports_since: &str,
+        ignore_non_obds_2: bool,
         use_pat_id: bool,
         include_extern: bool,
         include_histo_zyto: bool,
@@ -109,6 +112,7 @@ impl DatabaseSource {
                         params! {
                             "year" => year,
                             "ignore_exports_since" => ignore_exports_since,
+                            "ignore_non_obds_2" => if ignore_non_obds_2 { 1 } else { 0 },
                             "include_extern" => if include_extern { 1 } else { 0 },
                             "include_histo_zyto" => if include_histo_zyto { 1 } else { 0 }
                         },
