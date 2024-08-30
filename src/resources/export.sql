@@ -39,6 +39,7 @@ FROM (
         AND (lme.xml_daten LIKE '%<cTNM%' OR lme.xml_daten LIKE '%<pTNM%' OR lme.xml_daten LIKE '%<Menge_Histologie>%' OR lme.xml_daten LIKE '%<Menge_Weitere_Klassifikation>%')
         AND (lme.xml_daten NOT LIKE '%histologie_zytologie%' OR 1 = :include_histo_zyto)
         AND (EXTRACTVALUE(lme.xml_daten, '//Meldende_Stelle') NOT LIKE '%9999%' OR 1 <= :include_extern)
+        AND (EXTRACTVALUE(lme.xml_daten, '//ADT_GEKID/@Schema_Version') LIKE '2.%' OR 1 = :ignore_non_obds_2)
     ) o1
     LEFT OUTER JOIN (
 

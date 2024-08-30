@@ -129,6 +129,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             user,
             year,
             ignore_exports_since,
+            ignore_non_obds_2,
             include_extern,
             include_histo_zyto,
             schema_versions,
@@ -148,6 +149,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .check(
                     &year,
                     &ignore_exports_since.unwrap_or("9999-12-31".into()),
+                    ignore_non_obds_2,
                     include_extern,
                     include_histo_zyto,
                     schema_versions,
@@ -169,6 +171,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             output,
             year,
             ignore_exports_since,
+            ignore_non_obds_2,
             xls_csv,
             include_extern,
             include_histo_zyto,
@@ -188,6 +191,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .export(
                     &year,
                     &ignore_exports_since.unwrap_or("9999-12-31".into()),
+                    ignore_non_obds_2,
                     pat_id,
                     include_extern,
                     include_histo_zyto,
@@ -232,6 +236,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             file,
             year,
             ignore_exports_since,
+            ignore_non_obds_2,
             include_extern,
             include_histo_zyto,
         } => {
@@ -250,6 +255,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .export(
                     &year,
                     &ignore_exports_since.unwrap_or("9999-12-31".into()),
+                    ignore_non_obds_2,
                     pat_id,
                     include_extern,
                     include_histo_zyto,
