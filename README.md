@@ -2,6 +2,9 @@
 
 Anwendung zur Durchführung einer Plausibilitätsprüfung anhand der Daten für die BZKF Real World Data Platform.
 
+**Hinweis:** Dies ist eine Weiterführung des ursprünglichen
+Projekts [bzkf-rwdp-check](https://github.com/CCC-MF/bzkf-rwdp-check)
+
 ## Aufbau der ETL-Strecke an den Standorten
 
 Die Daten werden aus der Onkostar-Datenbank ausgelesen und in Apache-Kafka eingespeist.

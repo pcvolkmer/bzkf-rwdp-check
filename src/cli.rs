@@ -1,7 +1,7 @@
 /*
  * This file is part of bzkf-rwdp-check
  *
- * Copyright (C) 2024 Comprehensive Cancer Center Mainfranken and contributors.
+ * Copyright (C) 2024 the original author or authors.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -179,7 +179,12 @@ pub enum SubCommand {
         user: String,
         #[arg(short, long, help = "LKR-Export-Protokoll-Datei")]
         file: PathBuf,
-        #[arg(long, alias = "export-package", help = "Exportpaketnummer", default_value = "0")]
+        #[arg(
+            long,
+            alias = "export-package",
+            help = "Exportpaketnummer",
+            default_value = "0"
+        )]
         package: u16,
     },
 }
